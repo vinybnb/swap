@@ -6,16 +6,13 @@ const chainToQuery = 'bsc'
 let currentTrade = {};
 let currentSelectSide;
 let tokens;
+let user;
 
 async function init(){
     await Moralis.initPlugins();
     await Moralis.enable();
     await listAvailableTokens();
-    currentUser = Moralis.User.current();
-    if(currentUser){
-        document.getElementById("swap_button").disabled = false;
-        document.getElementById("login_button").hidden = true;
-    }
+    renderInterface();
 }
 
 async function listAvailableTokens(){
@@ -50,6 +47,21 @@ function selectToken(address){
 }
 
 function renderInterface(){
+    user = Moralis.User.current();
+    if (user) {
+        document.getElementById("swap_button").disabled = false;
+        document.getElementById("login_button").hidden = true;
+        document.getElementById("logout_button").hidden = false;
+        $('#address').text(shortenAddress(user.get("ethAddress")));
+        $('#address').show();
+    } else {
+        document.getElementById("swap_button").disabled = true;
+        document.getElementById("login_button").hidden = false;
+        document.getElementById("logout_button").hidden = true;
+        $('#address').text('');
+        $('#address').hide();
+    }
+
     if(currentTrade.from){
         document.getElementById("from_token_img").src = currentTrade.from.logoURI;
         document.getElementById("from_token_text").innerHTML = currentTrade.from.symbol;
@@ -61,19 +73,23 @@ function renderInterface(){
     }
 }
 
+function shortenAddress(address) {
+    return address.substring(0, 6) + '...' + address.substring(address.length - 5, address.length);
+}
+
 async function login() {
-    let user = Moralis.User.current();
+    user = Moralis.User.current();
     if (!user) {
-      user = await Moralis.Web3.authenticate();
+        user = await Moralis.Web3.authenticate();
     }
     console.log(user);
   
-    render();
+    renderInterface();
   }
 
 async function logOut() {
     await Moralis.User.logOut();
-    render();
+    renderInterface();
     console.log("logged out. User:", Moralis.User.current());
   }
 
