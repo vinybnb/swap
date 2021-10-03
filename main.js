@@ -92,7 +92,7 @@ async function renderSwapInfo() {
 }
 
 async function getBalances() {
-    const options = { chain: 'bsc testnet' } // BSC testnet. We will switch to bsc on the production
+    const options = { chain: 'bsc' } // BSC testnet. We will switch to bsc on the production
     balances[NATIVE_ADDRESS] = tokens[NATIVE_ADDRESS]
     const nativeBalance = await Moralis.Web3API.account.getNativeBalance(options);
     balances[NATIVE_ADDRESS].balance = nativeBalance.balance;
