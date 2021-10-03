@@ -10,6 +10,16 @@ let user;
 let balances = {};
 const NATIVE_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 let dex;
+let web3;
+const MAINNET_ID = 97; // We will switch to 56 for mainnet
+const networks = {
+    1: 'eth',
+    4: 'rinkeby',
+    56: 'bsc',
+    97: 'bsc testnet',
+    137: 'matic',
+    80001: 'mumbai'
+};
 
 async function init(){
     await Moralis.initPlugins();
@@ -38,12 +48,10 @@ async function listAvailableTokens(){
         div.onclick = (() => {selectToken(address)});
         parent.appendChild(div);
     }
-    console.log(tokens);
 }
 
 function selectToken(address){
     closeModal();
-    console.log(tokens);
     currentTrade[currentSelectSide] = tokens[address];
     renderSwapInfo();
     getQuote();
@@ -57,7 +65,14 @@ async function renderInterface() {
         document.getElementById("logout_button").hidden = false;
         $('#address').text(shortenAddress(user.get("ethAddress")));
         $('#address').show(user.get("ethAddress"));
-        getBalances();
+        web3 = await Moralis.enable();
+        networkId = await Moralis.web3.eth.net.getId();
+        if (networkId != MAINNET_ID) {
+            alert('Please switch to Binance Smart Chain Wallet');
+            logOut();
+        } else {
+            getBalances();
+        }
     } else {
         document.getElementById("swap_button").disabled = true;
         document.getElementById("login_button").hidden = false;
@@ -92,7 +107,7 @@ async function renderSwapInfo() {
 }
 
 async function getBalances() {
-    const options = { chain: 'bsc testnet' } // BSC testnet. We will switch to bsc on the production
+    const options = { chain: networks[MAINNET_ID] }
     balances[NATIVE_ADDRESS] = tokens[NATIVE_ADDRESS]
     const nativeBalance = await Moralis.Web3API.account.getNativeBalance(options);
     balances[NATIVE_ADDRESS].balance = nativeBalance.balance;
