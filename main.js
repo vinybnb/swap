@@ -173,7 +173,7 @@ async function trySwap(){
     }
     try {
         let recept = await dex.swap({
-            chain: 'bsc testnet', // The blockchain you want to use (eth/bsc/polygon)
+            chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
             fromTokenAddress: currentTrade.from.address, // The token you want to swap
             toTokenAddress: currentTrade.to.address, // The token you want to receive
             amount: amount,
