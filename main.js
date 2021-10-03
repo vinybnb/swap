@@ -7,16 +7,20 @@ let currentTrade = {};
 let currentSelectSide;
 let tokens;
 let user;
+let balances = {};
+const NATIVE_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+let dex;
 
 async function init(){
     await Moralis.initPlugins();
     await Moralis.enable();
+    dex = Moralis.Plugins.oneInch;
     await listAvailableTokens();
     renderInterface();
 }
 
 async function listAvailableTokens(){
-    const result = await Moralis.Plugins.oneInch.getSupportedTokens({
+    const result = await dex.getSupportedTokens({
         chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
       });
     tokens = result.tokens;
@@ -41,19 +45,19 @@ function selectToken(address){
     closeModal();
     console.log(tokens);
     currentTrade[currentSelectSide] = tokens[address];
-    console.log(currentTrade);
-    renderInterface();
+    renderSwapInfo();
     getQuote();
 }
 
-function renderInterface(){
+async function renderInterface() {
     user = Moralis.User.current();
     if (user) {
         document.getElementById("swap_button").disabled = false;
         document.getElementById("login_button").hidden = true;
         document.getElementById("logout_button").hidden = false;
         $('#address').text(shortenAddress(user.get("ethAddress")));
-        $('#address').show();
+        $('#address').show(user.get("ethAddress"));
+        getBalances();
     } else {
         document.getElementById("swap_button").disabled = true;
         document.getElementById("login_button").hidden = false;
@@ -61,17 +65,43 @@ function renderInterface(){
         $('#address').text('');
         $('#address').hide();
     }
+}
 
+async function renderSwapInfo() {
     if(currentTrade.from){
         document.getElementById("from_token_img").src = currentTrade.from.logoURI;
         document.getElementById("from_token_text").innerHTML = currentTrade.from.symbol;
+        let tokenInBalance = 0;
+        if (balances[currentTrade.from.address] !== undefined) {
+            tokenInBalance = balances[currentTrade.from.address].balance / (10 ** balances[currentTrade.from.address].decimals) || 0;
+        }
+        tokenInBalance = tokenInBalance.toFixed(6);
+        $('#token_in_balance').text(`${tokenInBalance} ${currentTrade.from.symbol}`);
     }
 
     if(currentTrade.to){
         document.getElementById("to_token_img").src = currentTrade.to.logoURI;
         document.getElementById("to_token_text").innerHTML = currentTrade.to.symbol;
+        let tokenOutBalance = 0;
+        if (balances[currentTrade.to.address] !== undefined) {
+            tokenOutBalance = balances[currentTrade.to.address].balance / (10 ** balances[currentTrade.to.address].decimals) || 0;
+        }
+        tokenOutBalance = tokenOutBalance.toFixed(6);
+        $('#token_out_balance').text(`${tokenOutBalance} ${currentTrade.to.symbol}`);
     }
 }
+
+async function getBalances() {
+    const options = { chain: 'bsc testnet' } // BSC testnet. We will switch to bsc on the production
+    balances[NATIVE_ADDRESS] = tokens[NATIVE_ADDRESS]
+    const nativeBalance = await Moralis.Web3API.account.getNativeBalance(options);
+    balances[NATIVE_ADDRESS].balance = nativeBalance.balance;
+    const tokenBalances = await Moralis.Web3API.account.getTokenBalances(options);
+    for (let tokenBalance of tokenBalances) {
+        balances[tokenBalance.token_address] = tokenBalance; 
+    }
+}
+
 
 function shortenAddress(address) {
     return address.substring(0, 6) + '...' + address.substring(address.length - 5, address.length);
@@ -108,7 +138,7 @@ async function getQuote(){
         document.getElementById("from_amount").value * 10**currentTrade.from.decimals
     )
 
-    const quote = await Moralis.Plugins.oneInch.quote({
+    const quote = await dex.quote({
         chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
         fromTokenAddress: currentTrade.from.address, // The token you want to swap
         toTokenAddress: currentTrade.to.address, // The token you want to receive
@@ -126,7 +156,7 @@ async function trySwap(){
         document.getElementById("from_amount").value * 10**currentTrade.from.decimals 
     )
     if(currentTrade.from.symbol !== "ETH"){
-        const allowance = await Moralis.Plugins.oneInch.hasAllowance({
+        const allowance = await dex.hasAllowance({
             chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
             fromTokenAddress: currentTrade.from.address, // The token you want to swap
             fromAddress: address, // Your wallet address
@@ -134,7 +164,7 @@ async function trySwap(){
         })
         console.log(allowance);
         if(!allowance){
-            await Moralis.Plugins.oneInch.approve({
+            await dex.approve({
                 chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
                 tokenAddress: currentTrade.from.address, // The token you want to swap
                 fromAddress: address, // Your wallet address
@@ -142,24 +172,20 @@ async function trySwap(){
         }
     }
     try {
-        let receipt = await doSwap(address, amount);
+        let recept = await dex.swap({
+            chain: 'bsc testnet', // The blockchain you want to use (eth/bsc/polygon)
+            fromTokenAddress: currentTrade.from.address, // The token you want to swap
+            toTokenAddress: currentTrade.to.address, // The token you want to receive
+            amount: amount,
+            fromAddress: address, // Your wallet address
+            slippage: 1,
+        });
+        console.log(recept);
         alert("Swap Complete");
     
     } catch (error) {
         console.log(error);
     }
-}
-
-function doSwap(userAddress, amount){
-    return Moralis.Plugins.oneInch.swap({
-        chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
-        fromTokenAddress: currentTrade.from.address, // The token you want to swap
-        toTokenAddress: currentTrade.to.address, // The token you want to receive
-        amount: amount,
-        fromAddress: userAddress, // Your wallet address
-        slippage: 1,
-    });
-    console.log(receipt);
 }
 
 init();

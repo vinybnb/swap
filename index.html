@@ -62,7 +62,14 @@
                 <h3 class="swap_text">Swap</h3>
                     <div id="form">
                         <div class="offset-sm" id="form_title">
-                            <h6>Token In</h6>
+                            <div class="row">
+                                <div class="col col-sm-6">
+                                    <h6>Token In</h6>
+                                </div>
+                                <div class="col col-sm-6">
+                                    <label id="token_in_balance" class="float-right token-amount">1 BNB</label>
+                                </div>
+                            </div>
                         </div>
                         <div class="swapbox">
                             <div class="swapbox_select token_select" id="from_token_select">
@@ -74,7 +81,14 @@
                             </div>
                         </div>
                         <div class="offset-sm" id="form_title">
-                            <h6>Token Out</h6>
+                            <div class="row">
+                                <div class="col col-sm-6">
+                                    <h6>Token Out</h6>
+                                </div>
+                                <div class="col col-sm-6">
+                                    <label id="token_out_balance" class="float-right token-amount">1 BNB</label>
+                                </div>
+                            </div>
                         </div>
                         <div class="swapbox">
                             <div class="swapbox_select token_select" id="to_token_select">
@@ -108,7 +122,6 @@
               </div>
             </div>
           </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="./main.js"></script>
   </body>
 </html>
