@@ -1,3 +1,23 @@
+@font-face {
+    font-family: 'PlusJakartaSansBold';
+    src:  url('fonts/PlusJakartaSans-Bold.woff2') format('woff2'),
+          url('fonts/PlusJakartaSans-Bold.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'PlusJakartaSansRegular';
+    src:  url('fonts/PlusJakartaSans-Regular.woff2') format('woff2'),
+          url('fonts/PlusJakartaSans-Regular.woff') format('woff');
+}
+
+body {
+    font-family: 'PlusJakartaSansRegular', Helvetica, Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'PlusJakartaSansBold', Helvetica, Arial, sans-serif;
+}
+
 #window{
     margin-top: 80px;
     margin-bottom: auto;
