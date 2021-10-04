@@ -60,50 +60,61 @@
         <div class="row">
             <div class="col col-md-6 offset-md-3" id="window">
                 <h3 class="swap_text">Swap</h3>
-                    <div id="form">
-                        <div class="offset-sm" id="form_title">
-                            <div class="row">
-                                <div class="col col-sm-6">
-                                    <h6>Token In</h6>
-                                </div>
-                                <div class="col col-sm-6">
-                                    <label id="token_in_balance" class="float-right token-amount">0.00</label>
-                                </div>
+                <div id="form">
+                    <div class="offset-sm" id="form_title">
+                        <div class="row">
+                            <div class="col col-sm-6">
+                                <h6>Token In</h6>
+                            </div>
+                            <div class="col col-sm-6">
+                                <label id="token_in_balance" class="float-right token-amount">0.00</label>
                             </div>
                         </div>
-                        <div class="swapbox">
-                            <div class="swapbox_select token_select" id="from_token_select">
-                              <img class="token_image" id="from_token_img">
-                              <span id="from_token_text"></span>
-                            </div>
-                            <div class="swapbox_select">
-                                <input class="number form-control" placeholder="amount" id="from_amount">
-                            </div>
-                        </div>
-                        <div class="offset-sm" id="form_title">
-                            <div class="row">
-                                <div class="col col-sm-6">
-                                    <h6>Token Out</h6>
-                                </div>
-                                <div class="col col-sm-6">
-                                    <label id="token_out_balance" class="float-right token-amount">0.00</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swapbox">
-                            <div class="swapbox_select token_select" id="to_token_select">
-                              <img class="token_image" id="to_token_img">
-                              <span id="to_token_text"></span>
-                            </div>
-                            <div class="swapbox_select">
-                                <input class="number form-control" placeholder="amount" id="to_amount">
-                            </div>
-                        </div>
-                        <div>Gas Estimate: <span id="gas_estimate"></span></div>
-                        <button class="btn btn-large btn-primary btn-block" id="swap_button" onclick="doSwap()">
-                            Begin Swap
-                        </button>
                     </div>
+                    <div class="swapbox">
+                        <div class="swapbox_select token_select" id="from_token_select">
+                            <img class="token_image" id="from_token_img">
+                            <span id="from_token_text"></span>
+                        </div>
+                        <div class="swapbox_select">
+                            <input class="number form-control" placeholder="amount" id="from_amount">
+                        </div>
+                    </div>
+                    <div class="offset-sm" id="form_title">
+                        <div class="row">
+                            <div class="col col-sm-6">
+                                <h6>Token Out</h6>
+                            </div>
+                            <div class="col col-sm-6">
+                                <label id="token_out_balance" class="float-right token-amount">0.00</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swapbox">
+                        <div class="swapbox_select token_select" id="to_token_select">
+                            <img class="token_image" id="to_token_img">
+                            <span id="to_token_text"></span>
+                        </div>
+                        <div class="swapbox_select">
+                            <input class="number form-control" placeholder="amount" id="to_amount">
+                        </div>
+                    </div>
+                    <div>Gas Estimate: <span id="gas_estimate"></span>0.00</div>
+                    <button class="btn btn-large btn-primary btn-block" id="swap_button" onclick="doSwap()">
+                        Begin Swap
+                    </button>
+                    <div class="row slippage">
+                        <div class="col">
+                            <h6>Slippage:</h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-9 range-container"><input type="range" class="form-control-range" value="0.5" min="0.1" onInput="$('#slippage_label').text($(this).val() + '%')"></div>
+                        <div class="col-3">
+                            <div class="col-3" id="slippage_label">0.5%</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
