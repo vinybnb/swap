@@ -205,7 +205,7 @@ async function trySwap(){
             toTokenAddress: currentTrade.to.address, // The token you want to receive
             amount: amount,
             fromAddress: address, // Your wallet address
-            slippage: 1,
+            slippage: parseInt($('#slippage').text()),
         });
         console.log(recept);
         alert("Swap Complete");
