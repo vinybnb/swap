@@ -32,11 +32,16 @@ async function init(){
 async function listAvailableTokens(){
     const result = await dex.getSupportedTokens({
         chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
-      });
+    });
     tokens = result.tokens;
+    showTokensList(tokens);
+}
+
+function showTokensList(filteredTokens) {
     let parent = document.getElementById("token_list");
-    for( const address in tokens){
-        let token = tokens[address];
+    $(parent).html('');
+    for (const address in filteredTokens) {
+        let token = filteredTokens[address];
         let div = document.createElement("div");
         div.setAttribute("data-address", address)
         div.className = "token_row";
@@ -82,6 +87,16 @@ async function renderInterface() {
     }
 }
 
+function filterTokens(keyword) {
+    const filteredTokens = Object.keys(tokens)
+        .filter(key => (key === keyword || tokens[key].symbol.toLowerCase().includes(keyword.toLowerCase())))
+        .reduce((obj, key) => {
+            obj[key] = tokens[key];
+            return obj;
+        }, {});
+    showTokensList(filteredTokens);
+}
+
 async function renderSwapInfo() {
     if(currentTrade.from){
         document.getElementById("from_token_img").src = currentTrade.from.logoURI;
@@ -117,7 +132,6 @@ async function getBalances() {
     }
 }
 
-
 function shortenAddress(address) {
     return address.substring(0, 6) + '...' + address.substring(address.length - 5, address.length);
 }
@@ -127,16 +141,14 @@ async function login() {
     if (!user) {
         user = await Moralis.Web3.authenticate();
     }
-    console.log(user);
   
     renderInterface();
-  }
+}
 
 async function logOut() {
     await Moralis.User.logOut();
     renderInterface();
-    console.log("logged out. User:", Moralis.User.current());
-  }
+}
 
 function openModal(side){
     currentSelectSide = side;
@@ -212,3 +224,6 @@ document.getElementById("login_button").onclick = login;
 document.getElementById("logout_button").onclick = logOut;
 document.getElementById("from_amount").onblur = getQuote;
 document.getElementById("swap_button").onclick = trySwap;
+$('#token-search-input').keyup(function () {
+    filterTokens($(this).val());
+});
