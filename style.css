@@ -124,7 +124,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .search-imput {
-    border-radius: 16px;
+    border-radius: 500px;
     display: block;
     font-size: 16px;
     height: 48px;
@@ -132,6 +132,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0px 16px;
     width: 100%;
     border: 2px solid rgb(45, 70, 185);
+    margin-bottom: 10px;
 }
 
 .slippage {
