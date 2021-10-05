@@ -11,7 +11,7 @@ let balances = {};
 const NATIVE_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 let dex;
 let web3;
-const MAINNET_ID = 56; // We will switch to 56 for mainnet
+const MAINNET_ID = 97; // We will switch to 56 for mainnet
 const networks = {
     1: 'eth',
     4: 'rinkeby',
@@ -34,6 +34,13 @@ async function listAvailableTokens(){
         chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
     });
     tokens = result.tokens;
+    tokens['0x18950820A9108A47295b40B278F243DfC5D327B5'] = {
+        symbol: 'CASH',
+        name: 'Caash',
+        decimals: 18,
+        address: '0x18950820A9108A47295b40B278F243DfC5D327B5',
+        logoURI: 'https://bscscan.com/token/images/caashme_32.png'
+    }
     showTokensList(tokens);
 }
 
