@@ -8,10 +8,11 @@ let currentSelectSide;
 let tokens;
 let user;
 let balances = {};
-const NATIVE_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+const NATIVE_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+const CASH_ADDRESS = '0x18950820a9108a47295b40b278f243dfc5d327b5';
 let dex;
 let web3;
-const MAINNET_ID = 97; // We will switch to 56 for mainnet
+const MAINNET_ID = 56; // We will switch to 56 for mainnet
 const GAS_PRICE = 20; // Gwei
 const networks = {
     1: 'eth',
@@ -35,13 +36,14 @@ async function listAvailableTokens(){
         chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
     });
     tokens = result.tokens;
-    tokens['0x18950820A9108A47295b40B278F243DfC5D327B5'] = {
+    tokens[CASH_ADDRESS] = {
         symbol: 'CASH',
         name: 'Caash',
         decimals: 18,
-        address: '0x18950820A9108A47295b40B278F243DfC5D327B5',
+        address: CASH_ADDRESS,
         logoURI: 'https://bscscan.com/token/images/caashme_32.png'
     }
+    console.log(tokens);
     showTokensList(tokens);
 }
 
@@ -131,13 +133,14 @@ async function renderSwapInfo() {
 }
 
 async function getBalances() {
-    const options = { chain: networks[MAINNET_ID] }
-    balances[NATIVE_ADDRESS] = tokens[NATIVE_ADDRESS]
+    const options = { chain: networks[MAINNET_ID] };
     const nativeBalance = await Moralis.Web3API.account.getNativeBalance(options);
+    balances[NATIVE_ADDRESS] = Object.assign({}, tokens[NATIVE_ADDRESS]);
     balances[NATIVE_ADDRESS].balance = nativeBalance.balance;
     const tokenBalances = await Moralis.Web3API.account.getTokenBalances(options);
     for (let tokenBalance of tokenBalances) {
-        balances[tokenBalance.token_address] = tokenBalance; 
+        balances[tokenBalance.token_address] = Object.assign({}, tokens[tokenBalance.token_address]);
+        balances[tokenBalance.token_address].balance = tokenBalance.balance;
     }
 }
 
