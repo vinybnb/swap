@@ -11,7 +11,8 @@ let balances = {};
 const NATIVE_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 let dex;
 let web3;
-const MAINNET_ID = 56; // We will switch to 56 for mainnet
+const MAINNET_ID = 97; // We will switch to 56 for mainnet
+const GAS_PRICE = 20; // Gwei
 const networks = {
     1: 'eth',
     4: 'rinkeby',
@@ -176,8 +177,6 @@ async function getQuote() {
     $('#gas_estimate').text("calculating...");
     $('#to_amount').val("calculating...");
     
-    console.log(amount);
-
     const quote = await dex.quote({
         chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
         fromTokenAddress: currentTrade.from.address, // The token you want to swap
@@ -186,7 +185,8 @@ async function getQuote() {
     })
 
     console.log(quote);
-    $('#gas_estimate').text(quote.estimatedGas);
+    const estmatedGasFee = quote.estimatedGas * GAS_PRICE / 10**9;
+    $('#gas_estimate').text(estmatedGasFee);
     $('#to_amount').val(quote.toTokenAmount);
 }
 
