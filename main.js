@@ -173,7 +173,7 @@ function closeModal(){
 async function getQuote() {
     const amount = parseFloat($('#from_amount').val());
     if(!currentTrade.from || !currentTrade.to || isNaN(amount) || amount == 0) {
-        $('#gas_estimate').text('0.00');
+        $('#gas_estimate').text('0.00 BNB');
         $('#to_amount').val('0.00');
         return;
     }
@@ -189,7 +189,7 @@ async function getQuote() {
 
     console.log(quote);
     const estmatedGasFee = quote.estimatedGas * GAS_PRICE / 10**9;
-    $('#gas_estimate').text(estmatedGasFee);
+    $('#gas_estimate').text(estmatedGasFee + ' BNB');
     $('#to_amount').val(quote.toTokenAmount);
 }
 
