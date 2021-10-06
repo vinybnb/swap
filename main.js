@@ -11,7 +11,7 @@ let balances = {};
 const NATIVE_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 let dex;
 let web3;
-const MAINNET_ID = 97; // We will switch to 56 for mainnet
+const MAINNET_ID = 56; // We will switch to 56 for mainnet
 const GAS_PRICE = 20; // Gwei
 const networks = {
     1: 'eth',
