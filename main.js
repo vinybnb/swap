@@ -23,6 +23,11 @@ const networks = {
     80001: 'mumbai'
 };
 
+Number.prototype.countDecimals = function () {
+    if(Math.floor(this.valueOf()) === this.valueOf()) return 0;
+    return this.toString().split(".")[1].length || 0; 
+}
+
 async function init(){
     await Moralis.initPlugins();
     await Moralis.enable();
@@ -179,18 +184,18 @@ async function getQuote() {
     }
     $('#gas_estimate').text("calculating...");
     $('#to_amount').val("calculating...");
-    
+
     const quote = await dex.quote({
         chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
         fromTokenAddress: currentTrade.from.address, // The token you want to swap
         toTokenAddress: currentTrade.to.address, // The token you want to receive
-        amount: amount,
+        amount: amount * (10 ** amount.countDecimals()),
     })
 
     console.log(quote);
     const estmatedGasFee = quote.estimatedGas * GAS_PRICE / 10**9;
     $('#gas_estimate').text(estmatedGasFee + ' BNB');
-    $('#to_amount').val(quote.toTokenAmount);
+    $('#to_amount').val(quote.toTokenAmount / (10 ** amount.countDecimals()));
 }
 
 async function trySwap(){
