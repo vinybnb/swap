@@ -94,7 +94,8 @@ async function renderInterface() {
     }
 }
 
-function filterTokens(keyword) {
+function filterTokens() {
+    const keyword = $('#token_search_input').val();
     const filteredTokens = Object.keys(tokens)
         .filter(key => (key === keyword || tokens[key].symbol.toLowerCase().includes(keyword.toLowerCase())))
         .reduce((obj, key) => {
@@ -165,12 +166,17 @@ function closeModal(){
     document.getElementById("token_modal").style.display = "none";
 }
 
-async function getQuote(){
-    if(!currentTrade.from || !currentTrade.to || !document.getElementById("from_amount").value) return;
+async function getQuote() {
+    const amount = parseFloat($('#from_amount').val());
+    if(!currentTrade.from || !currentTrade.to || isNaN(amount) || amount == 0) {
+        $('#gas_estimate').text('0.00');
+        $('#to_amount').val('0.00');
+        return;
+    }
+    $('#gas_estimate').text("calculating...");
+    $('#to_amount').val("calculating...");
     
-    let amount = Number(
-        document.getElementById("from_amount").value * 10**currentTrade.from.decimals
-    )
+    console.log(amount);
 
     const quote = await dex.quote({
         chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
@@ -180,8 +186,8 @@ async function getQuote(){
     })
 
     console.log(quote);
-    document.getElementById("gas_estimate").innerHTML = quote.estimatedGas;
-    document.getElementById("to_amount").value = quote.toTokenAmount / (10**quote.toToken.decimals)
+    $('#gas_estimate').text(quote.estimatedGas);
+    $('#to_amount').val(quote.toTokenAmount);
 }
 
 async function trySwap(){
@@ -229,8 +235,6 @@ document.getElementById("from_token_select").onclick = (() => {openModal("from")
 document.getElementById("to_token_select").onclick = (() => {openModal("to")});
 document.getElementById("login_button").onclick = login;
 document.getElementById("logout_button").onclick = logOut;
-document.getElementById("from_amount").onblur = getQuote;
+document.getElementById("from_amount").onkeyup = getQuote;
 document.getElementById("swap_button").onclick = trySwap;
-$('#token-search-input').keyup(function () {
-    filterTokens($(this).val());
-});
+document.getElementById("token_search_input").onkeyup = filterTokens;
