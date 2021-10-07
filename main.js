@@ -14,7 +14,7 @@ const CASH_ADDRESS = '0x18950820a9108a47295b40b278f243dfc5d327b5';
 const USDT_ADDRESS = '0x55d398326f99059ff775485246999027b3197955';
 let dex;
 let web3;
-const MAINNET_ID = 56; // We will switch to 56 for mainnet
+const MAINNET_ID = 97; // We will switch to 56 for mainnet
 const GAS_PRICE = 20; // Gwei
 const networks = {
     1: 'eth',
@@ -37,6 +37,10 @@ async function init(){
     await listAvailableTokens();
     loadCashPrice();
     renderInterface();
+    const options = {
+        delay: 30000,
+    };
+    $('.toast').toast(options);
 }
 
 async function listAvailableTokens(){
@@ -62,6 +66,14 @@ async function loadCashPrice() {
     };
     const cashPrice = await Moralis.Web3API.token.getTokenPrice(options);
     $('#cash_price').text(cashPrice.usdPrice.toFixed(6));
+    // const quote = await dex.quote({
+    //     chain: 'bsc',
+    //     fromTokenAddress: '0x18950820a9108a47295b40b278f243dfc5d327b5',
+    //     toTokenAddress: '0x55d398326f99059ff775485246999027b3197955',
+    //     amount: 1,
+    //     protocols: "pancakeswap-v2"
+    // });
+    // console.log(quote);
 }
 
 function showTokensList(filteredTokens) {
@@ -230,7 +242,7 @@ async function trySwap(){
             fromAddress: address, // Your wallet address
             amount: amount,
         })
-        console.log(allowance);
+        console.log('allowance', allowance);
         if(!allowance){
             await dex.approve({
                 chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
@@ -240,7 +252,7 @@ async function trySwap(){
         }
     }
     try {
-        let recept = await dex.swap({
+        let receipt = await dex.swap({
             chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
             fromTokenAddress: currentTrade.from.address, // The token you want to swap
             toTokenAddress: currentTrade.to.address, // The token you want to receive
@@ -248,9 +260,10 @@ async function trySwap(){
             fromAddress: address, // Your wallet address
             slippage: parseInt($('#slippage').text()),
         });
-        console.log(recept);
-        alert("Swap Complete");
-    
+        console.log('receipt', receipt);
+        $('.receipt-body').text(`Swap ${amount/10**18} ${currentTrade.from.symbol} for ${receipt.toTokenAmount} ${currentTrade.to.symbol}`);
+        $('.receipt-link a').prop('href', 'https://testnet.bscscan.com/tx/' + receipt.transactionHash);
+        $('.toast').toast('show');
     } catch (error) {
         console.log(error);
     }

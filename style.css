@@ -147,3 +147,57 @@ h1, h2, h3, h4, h5, h6 {
     margin-right: 20px;
     padding-top: 3px;
 }
+
+.toast {
+    border-radius: 20px;
+    width: 400px;
+    max-width: 400px;
+}
+
+.toast-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 60px;
+    margin-right: 10px;
+}
+
+.receipt-status {
+    background-color: #32D0AA;
+}
+
+.receipt-status i {
+    color: #FFFFFF;
+    padding-top: 12px;
+    padding-left: 13px;
+}
+
+.receipt-body {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.receipt-link {
+    font-weight:bold;
+    font-size: 16px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.receipt-link a {
+    color:#26C9D4;
+}
+
+.receipt-link a:hover {
+    text-decoration: none;
+}
+
+.toast-container button {
+    color: #32D0AA;
+    margin-top: 10px;
+    margin-right: 20px;
+}
+
+.toast-container h6 {
+    margin-top: 15px;
+}
