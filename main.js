@@ -9,6 +9,7 @@ let tokens;
 let user;
 let balances = {};
 const NATIVE_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+const WBNB_ADDRESS = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
 const CASH_ADDRESS = '0x18950820a9108a47295b40b278f243dfc5d327b5';
 let dex;
 let web3;
@@ -65,10 +66,18 @@ function showTokensList(filteredTokens) {
         <span class="token_list_text">${token.symbol}</span>
         `
         div.innerHTML = html;
-        div.onclick = (() => {selectToken(address)});
         parent.appendChild(div);
     }
+    if (filteredTokens[CASH_ADDRESS] !== undefined && filteredTokens[WBNB_ADDRESS] !== undefined) {
+        const cashHtml = $(`.token_row[data-address=${CASH_ADDRESS}]`).prop('outerHTML');
+        $(`.token_row[data-address=${CASH_ADDRESS}]`).remove();
+        $(`.token_row[data-address=${WBNB_ADDRESS}]`).after(cashHtml);
+    }
 }
+
+$(document).on('click', '.token_row', function () {
+    selectToken($(this).data('address'));
+});
 
 function selectToken(address){
     closeModal();
