@@ -163,7 +163,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .receipt-status {
-    background-color: #32D0AA;
+    background-color: #F037A5;
 }
 
 .receipt-status i {
@@ -185,7 +185,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .receipt-link a {
-    color:#26C9D4;
+    color:#F037A5;
 }
 
 .receipt-link a:hover {
@@ -193,7 +193,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .toast-container button {
-    color: #32D0AA;
+    color: #F037A5;
     margin-top: 10px;
     margin-right: 20px;
 }
