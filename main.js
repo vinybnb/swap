@@ -257,6 +257,8 @@ async function trySwap(){
         }
     }
     try {
+        $('#swap_button').text('Swapping...');
+        $('#swap_button').prop('disabled', true);
         let receipt = await dex.swap({
             chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
             fromTokenAddress: currentTrade.from.address, // The token you want to swap
@@ -269,6 +271,8 @@ async function trySwap(){
         const toAmount = $('#to_amount').val();
         $('.receipt-body').text(`Swap ${amount/10**18} ${currentTrade.from.symbol} for ${toAmount} ${currentTrade.to.symbol}`);
         $('.receipt-link a').prop('href', 'https://bscscan.com/tx/' + receipt.transactionHash);
+        $('#swap_button').text('Begin Swap');
+        $('#swap_button').prop('disabled', false);
         await updateTokenBalance();
         $('.toast').toast('show');
     } catch (error) {
