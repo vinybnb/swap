@@ -68,7 +68,9 @@ async function loadCashPrice() {
         amount: 1,
     });
     const cashPrice = parseFloat(usdtQuote.toTokenAmount) / parseFloat(cashQuote.toTokenAmount);
-    $('#cash_price').text(cashPrice.toFixed(6));
+    if (!isNaN(cashPrice)) {
+        $('#cash_price').text(cashPrice.toFixed(6));
+    }
 }
 
 function showTokensList(filteredTokens) {
