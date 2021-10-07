@@ -55,22 +55,13 @@ async function listAvailableTokens(){
 }
 
 async function loadCashPrice() {
-    const cashQuote = await dex.quote({
-        chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
-        fromTokenAddress: NATIVE_ADDRESS, // The token you want to swap
-        toTokenAddress: CASH_ADDRESS, // The token you want to receive
-        amount: 1,
-    });
-    const usdtQuote = await dex.quote({
-        chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
-        fromTokenAddress: NATIVE_ADDRESS, // The token you want to swap
-        toTokenAddress: USDT_ADDRESS, // The token you want to receive
-        amount: 1,
-    });
-    const cashPrice = parseFloat(usdtQuote.toTokenAmount) / parseFloat(cashQuote.toTokenAmount);
-    if (!isNaN(cashPrice)) {
-        $('#cash_price').text(cashPrice.toFixed(6));
-    }
+    const options = {
+        address: CASH_ADDRESS,
+        chain: "bsc",
+        exchange: "PancakeSwapv2"
+    };
+    const cashPrice = await Moralis.Web3API.token.getTokenPrice(options);
+    $('#cash_price').text(cashPrice.usdPrice.toFixed(6));
 }
 
 function showTokensList(filteredTokens) {
