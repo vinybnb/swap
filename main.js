@@ -25,11 +25,6 @@ const networks = {
     80001: 'mumbai'
 };
 
-Number.prototype.countDecimals = function () {
-    if(Math.floor(this.valueOf()) === this.valueOf()) return 0;
-    return this.toString().split(".")[1].length || 0; 
-}
-
 async function init(){
     await Moralis.initPlugins();
     await Moralis.enable();
