@@ -261,7 +261,7 @@ async function trySwap(){
             slippage: parseInt($('#slippage').text()),
         });
         console.log('receipt', receipt);
-        $('.receipt-body').text(`Swap ${amount/10**18} ${currentTrade.from.symbol} for ${receipt.toTokenAmount} ${currentTrade.to.symbol}`);
+        $('.receipt-body').text(`Swap ${amount/10**18} ${currentTrade.from.symbol} for ${receipt.toTokenAmount || 0.00 } ${currentTrade.to.symbol}`);
         $('.receipt-link a').prop('href', 'https://testnet.bscscan.com/tx/' + receipt.transactionHash);
         $('.toast').toast('show');
     } catch (error) {
