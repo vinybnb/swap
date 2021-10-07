@@ -14,7 +14,7 @@ const CASH_ADDRESS = '0x18950820a9108a47295b40b278f243dfc5d327b5';
 const USDT_ADDRESS = '0x55d398326f99059ff775485246999027b3197955';
 let dex;
 let web3;
-const MAINNET_ID = 97; // We will switch to 56 for mainnet
+const MAINNET_ID = 56; // We will switch to 56 for mainnet
 const GAS_PRICE = 20; // Gwei
 const networks = {
     1: 'eth',
@@ -262,7 +262,7 @@ async function trySwap(){
         });
         console.log('receipt', receipt);
         $('.receipt-body').text(`Swap ${amount/10**18} ${currentTrade.from.symbol} for ${receipt.toTokenAmount || 0.00 } ${currentTrade.to.symbol}`);
-        $('.receipt-link a').prop('href', 'https://testnet.bscscan.com/tx/' + receipt.transactionHash);
+        $('.receipt-link a').prop('href', 'https://bscscan.com/tx/' + receipt.transactionHash);
         $('.toast').toast('show');
     } catch (error) {
         console.log(error);
