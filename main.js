@@ -14,7 +14,7 @@ const CASH_ADDRESS = '0x18950820a9108a47295b40b278f243dfc5d327b5';
 const USDT_ADDRESS = '0x55d398326f99059ff775485246999027b3197955';
 let dex;
 let web3;
-const MAINNET_ID = 56; // 56 for mainnet
+const MAINNET_ID = 97; // 56 for mainnet
 const GAS_PRICE = 20; // Gwei
 const networks = {
     1: 'eth',
@@ -169,6 +169,11 @@ async function renderSwapInfo() {
     }
 }
 
+async function updateTokenBalance() {
+    await getBalances();
+    renderSwapInfo();
+}
+
 async function getBalances() {
     const options = { chain: networks[MAINNET_ID] };
     const nativeBalance = await Moralis.Web3API.account.getNativeBalance(options);
@@ -264,6 +269,7 @@ async function trySwap(){
         const toAmount = $('#to_amount').val();
         $('.receipt-body').text(`Swap ${amount/10**18} ${currentTrade.from.symbol} for ${toAmount} ${currentTrade.to.symbol}`);
         $('.receipt-link a').prop('href', 'https://bscscan.com/tx/' + receipt.transactionHash);
+        await updateTokenBalance();
         $('.toast').toast('show');
     } catch (error) {
         console.log(error);
