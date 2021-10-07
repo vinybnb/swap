@@ -11,6 +11,7 @@ let balances = {};
 const NATIVE_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 const WBNB_ADDRESS = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
 const CASH_ADDRESS = '0x18950820a9108a47295b40b278f243dfc5d327b5';
+const USDT_ADDRESS = '0x55d398326f99059ff775485246999027b3197955';
 let dex;
 let web3;
 const MAINNET_ID = 56; // We will switch to 56 for mainnet
@@ -34,6 +35,7 @@ async function init(){
     await Moralis.enable();
     dex = Moralis.Plugins.oneInch;
     await listAvailableTokens();
+    loadCashPrice();
     renderInterface();
 }
 
@@ -49,8 +51,24 @@ async function listAvailableTokens(){
         address: CASH_ADDRESS,
         logoURI: 'https://bscscan.com/token/images/caashme_32.png'
     }
-    console.log(tokens);
     showTokensList(tokens);
+}
+
+async function loadCashPrice() {
+    const cashQuote = await dex.quote({
+        chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
+        fromTokenAddress: NATIVE_ADDRESS, // The token you want to swap
+        toTokenAddress: CASH_ADDRESS, // The token you want to receive
+        amount: 1,
+    });
+    const usdtQuote = await dex.quote({
+        chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
+        fromTokenAddress: NATIVE_ADDRESS, // The token you want to swap
+        toTokenAddress: USDT_ADDRESS, // The token you want to receive
+        amount: 1,
+    });
+    const cashPrice = parseFloat(usdtQuote.toTokenAmount) / parseFloat(cashQuote.toTokenAmount);
+    $('#cash_price').text(cashPrice.toFixed(6));
 }
 
 function showTokensList(filteredTokens) {
