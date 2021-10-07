@@ -14,7 +14,7 @@ const CASH_ADDRESS = '0x18950820a9108a47295b40b278f243dfc5d327b5';
 const USDT_ADDRESS = '0x55d398326f99059ff775485246999027b3197955';
 let dex;
 let web3;
-const MAINNET_ID = 56; // 56 for mainnet
+const MAINNET_ID = 97; // 56 for mainnet
 const GAS_PRICE = 20; // Gwei
 const networks = {
     1: 'eth',
@@ -66,14 +66,6 @@ async function loadCashPrice() {
     };
     const cashPrice = await Moralis.Web3API.token.getTokenPrice(options);
     $('#cash_price').text(cashPrice.usdPrice.toFixed(6));
-    // const quote = await dex.quote({
-    //     chain: 'bsc',
-    //     fromTokenAddress: '0x18950820a9108a47295b40b278f243dfc5d327b5',
-    //     toTokenAddress: '0x55d398326f99059ff775485246999027b3197955',
-    //     amount: 1,
-    //     protocols: "pancakeswap-v2"
-    // });
-    // console.log(quote);
 }
 
 function showTokensList(filteredTokens) {
@@ -220,34 +212,30 @@ async function getQuote() {
         return;
     }
     $('#gas_estimate').text("calculating...");
-    $('#to_amount').val("calculating...");
+    $('#to_amount').val("");
 
     const quote = await dex.quote({
         chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
         fromTokenAddress: currentTrade.from.address, // The token you want to swap
         toTokenAddress: currentTrade.to.address, // The token you want to receive
-        amount: amount * (10 ** amount.countDecimals()),
-    })
-
-    console.log(quote);
+        amount: Moralis.Units.Token(amount, currentTrade.from.decimals).toString(),
+    });
     const estmatedGasFee = quote.estimatedGas * GAS_PRICE / 10**9;
     $('#gas_estimate').text(estmatedGasFee + ' BNB');
-    $('#to_amount').val(quote.toTokenAmount / (10 ** amount.countDecimals()));
+    const toTokenAmount = quote.toTokenAmount / 10 ** currentTrade.to.decimals;
+    $('#to_amount').val(toTokenAmount.toFixed(6));
 }
 
 async function trySwap(){
     let address = Moralis.User.current().get("ethAddress");
-    let amount = Number( 
-        document.getElementById("from_amount").value * 10**currentTrade.from.decimals 
-    )
+    const amount = parseFloat($('#from_amount').val());
     if(currentTrade.from.symbol !== "ETH"){
         const allowance = await dex.hasAllowance({
             chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
             fromTokenAddress: currentTrade.from.address, // The token you want to swap
             fromAddress: address, // Your wallet address
-            amount: amount,
+            amount: Moralis.Units.Token(amount, currentTrade.from.decimals).toString(),
         })
-        console.log('allowance', allowance);
         if(!allowance){
             await dex.approve({
                 chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
@@ -263,13 +251,12 @@ async function trySwap(){
             chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
             fromTokenAddress: currentTrade.from.address, // The token you want to swap
             toTokenAddress: currentTrade.to.address, // The token you want to receive
-            amount: amount,
+            amount: Moralis.Units.Token(amount, currentTrade.from.decimals).toString(),
             fromAddress: address, // Your wallet address
             slippage: parseInt($('#slippage').text()),
         });
-        console.log('receipt', receipt);
         const toAmount = $('#to_amount').val();
-        $('.receipt-body').text(`Swap ${amount/10**18} ${currentTrade.from.symbol} for ${toAmount} ${currentTrade.to.symbol}`);
+        $('.receipt-body').text(`Swap ${amount} ${currentTrade.from.symbol} for ${toAmount} ${currentTrade.to.symbol}`);
         $('.receipt-link a').prop('href', 'https://bscscan.com/tx/' + receipt.transactionHash);
         $('#swap_button').text('Begin Swap');
         $('#swap_button').prop('disabled', false);
