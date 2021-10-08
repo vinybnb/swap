@@ -8,6 +8,9 @@ let currentSelectSide;
 let tokens;
 let user;
 let balances = {};
+let fromAmount = 0.00;
+let toAmount = 0.00
+const DECIMALS = 8;
 const NATIVE_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 const WBNB_ADDRESS = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
 const CASH_ADDRESS = '0x18950820a9108a47295b40b278f243dfc5d327b5';
@@ -60,7 +63,7 @@ async function loadCashPrice() {
         exchange: "PancakeSwapv2"
     };
     const cashPrice = await Moralis.Web3API.token.getTokenPrice(options);
-    $('#cash_price').text(cashPrice.usdPrice.toFixed(6));
+    $('#cash_price').text(Number(cashPrice.usdPrice.toFixed(DECIMALS)));
 }
 
 function showTokensList(filteredTokens) {
@@ -140,8 +143,11 @@ async function renderSwapInfo() {
         if (balances[currentTrade.from.address] !== undefined) {
             tokenInBalance = balances[currentTrade.from.address].balance / (10 ** balances[currentTrade.from.address].decimals) || 0;
         }
-        tokenInBalance = tokenInBalance.toFixed(6);
+        tokenInBalance = Number(tokenInBalance.toFixed(DECIMALS));
         $('#token_in_balance').text(`${tokenInBalance} ${currentTrade.from.symbol}`);
+    } else {
+        $('#from_token_select').html('<img class="token_image" id="from_token_img"> <span id="from_token_text"></span>');
+        $('#token_in_balance').text('0.00');
     }
 
     if(currentTrade.to){
@@ -151,9 +157,14 @@ async function renderSwapInfo() {
         if (balances[currentTrade.to.address] !== undefined) {
             tokenOutBalance = balances[currentTrade.to.address].balance / (10 ** balances[currentTrade.to.address].decimals) || 0;
         }
-        tokenOutBalance = tokenOutBalance.toFixed(6);
+        tokenOutBalance = Number(tokenOutBalance.toFixed(DECIMALS));
         $('#token_out_balance').text(`${tokenOutBalance} ${currentTrade.to.symbol}`);
+    } else {
+        $('#to_token_select').html('<img class="token_image" id="to_token_img"> <span id="to_token_text"></span>');
+        $('#token_out_balance').text('0.00');
     }
+    $('#from_amount').val(Number(fromAmount.toFixed(DECIMALS)));
+    $('#to_amount').val(Number(toAmount.toFixed(DECIMALS)));
 }
 
 async function updateTokenBalance() {
@@ -201,35 +212,37 @@ function closeModal(){
 
 async function getQuote() {
     const amount = parseFloat($('#from_amount').val());
-    if(!currentTrade.from || !currentTrade.to || isNaN(amount) || amount == 0) {
+    fromAmount = isNaN(amount) ? 0.00 : amount;
+    if(!currentTrade.from || !currentTrade.to || fromAmount == 0) {
         $('#gas_estimate').text('0.00 BNB');
+        toAmount = 0.00;
         $('#to_amount').val('0.00');
         return;
     }
     $('#gas_estimate').text("calculating...");
-    $('#to_amount').val("");
+    toAmount = 0.00;
+    $('#to_amount').val('0.00');
 
     const quote = await dex.quote({
         chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
         fromTokenAddress: currentTrade.from.address, // The token you want to swap
         toTokenAddress: currentTrade.to.address, // The token you want to receive
-        amount: Moralis.Units.Token(amount, currentTrade.from.decimals).toString(),
+        amount: Moralis.Units.Token(fromAmount, currentTrade.from.decimals).toString(),
     });
     const estmatedGasFee = quote.estimatedGas * GAS_PRICE / 10**9;
-    $('#gas_estimate').text(estmatedGasFee + ' BNB');
-    const toTokenAmount = quote.toTokenAmount / 10 ** currentTrade.to.decimals;
-    $('#to_amount').val(toTokenAmount.toFixed(6));
+    $('#gas_estimate').text(Number(estmatedGasFee.toFixed(DECIMALS)) + ' BNB');
+    toAmount = quote.toTokenAmount / 10 ** currentTrade.to.decimals;
+    $('#to_amount').val(Number(toAmount.toFixed(DECIMALS)));
 }
 
 async function trySwap(){
     let address = Moralis.User.current().get("ethAddress");
-    const amount = parseFloat($('#from_amount').val());
     if(currentTrade.from.symbol !== "ETH"){
         const allowance = await dex.hasAllowance({
             chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
             fromTokenAddress: currentTrade.from.address, // The token you want to swap
             fromAddress: address, // Your wallet address
-            amount: Moralis.Units.Token(amount, currentTrade.from.decimals).toString(),
+            amount: Moralis.Units.Token(fromAmount, currentTrade.from.decimals).toString(),
         })
         if(!allowance){
             await dex.approve({
@@ -246,12 +259,11 @@ async function trySwap(){
             chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
             fromTokenAddress: currentTrade.from.address, // The token you want to swap
             toTokenAddress: currentTrade.to.address, // The token you want to receive
-            amount: Moralis.Units.Token(amount, currentTrade.from.decimals).toString(),
+            amount: Moralis.Units.Token(fromAmount, currentTrade.from.decimals).toString(),
             fromAddress: address, // Your wallet address
             slippage: parseInt($('#slippage').text()),
         });
-        const toAmount = $('#to_amount').val();
-        $('.receipt-body').text(`Swap ${amount} ${currentTrade.from.symbol} for ${toAmount} ${currentTrade.to.symbol}`);
+        $('.receipt-body').text(`Swap ${fromAmount} ${currentTrade.from.symbol} for ${toAmount} ${currentTrade.to.symbol}`);
         $('.receipt-link a').prop('href', 'https://bscscan.com/tx/' + receipt.transactionHash);
         $('#swap_button').text('Begin Swap');
         $('#swap_button').prop('disabled', false);
@@ -262,6 +274,24 @@ async function trySwap(){
     }
 }
 
+function exchangeToken() {
+    const currentTradeTo = currentTrade.to ? Object.assign({}, currentTrade.to) : null;
+    if(currentTrade.from) {
+        currentTrade.to = Object.assign({}, currentTrade.from);
+    } else {
+        delete currentTrade['to'];
+    }
+    if(currentTradeTo) {
+        currentTrade.from = currentTradeTo;
+    } else {
+        delete currentTrade['from'];
+    }
+    const tempToAmount = toAmount;
+    toAmount = fromAmount;
+    fromAmount = tempToAmount;
+    renderSwapInfo();
+}
+
 init();
 
 document.getElementById("modal_close").onclick = closeModal;
@@ -269,6 +299,7 @@ document.getElementById("from_token_select").onclick = (() => {openModal("from")
 document.getElementById("to_token_select").onclick = (() => {openModal("to")});
 document.getElementById("login_button").onclick = login;
 document.getElementById("logout_button").onclick = logOut;
+document.getElementById("btn_exchange").onclick = exchangeToken;
 document.getElementById("from_amount").onkeyup = getQuote;
 document.getElementById("swap_button").onclick = trySwap;
 document.getElementById("token_search_input").onkeyup = filterTokens;

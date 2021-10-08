@@ -68,7 +68,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .swapbox{
     overflow: auto;
-    margin: 0 10px 20px 5px;
+    margin: 0 10px 10px 5px;
     padding: 10px;
     background-color: #f9f9f9;
     border-radius: 500px;
@@ -201,4 +201,19 @@ h1, h2, h3, h4, h5, h6 {
 
 .toast-container h6 {
     margin-top: 15px;
+}
+
+.btn-exchange-container {
+    display: flex;
+    justify-content: center;
+}
+
+#btn_exchange {
+    padding-left: 4px;
+    margin-bottom: -10px;
+    border-radius: 12px;
+    height: 36px;
+    width: 36px;
+    background-color: rgb(247, 248, 250);
+    border: 4px solid rgb(255, 255, 255);
 }
