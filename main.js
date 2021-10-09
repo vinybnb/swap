@@ -33,13 +33,15 @@ const networks = {
 
 // currently, Moralis plugin doesn't support protocols parameter so we will call 1inch API directly with protocol PANCAKESWAP_V2. Because without protocols parameter, the 1inch API return wrong price when the amount is <= 1 usdt due to the fee is often > 1usdt. And the important thing is the price from 1Inch without protocols parameter is average price from many dexes so and we want it to be the same with pancakeswap.
 
+setInterval(function(){ 
+    loadCashPrice();
+}, 5000);
 
 async function init(){
     await Moralis.initPlugins();
     await Moralis.enable();
     dex = Moralis.Plugins.oneInch;
     await listAvailableTokens();
-    loadCashPrice();
     renderInterface();
     const options = {
         delay: 30000,
