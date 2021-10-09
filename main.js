@@ -11,6 +11,8 @@ let balances = {};
 let fromAmount = 0.00;
 let toAmount = 0.00
 const DECIMALS = 8;
+let isFromAmountInput = true; // true if user input on "from amount", false if user input on "to amount"
+const API_1INCH_BASE = "https://api.1inch.exchange/v3.0/56/";
 const NATIVE_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 const WBNB_ADDRESS = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
 const CASH_ADDRESS = '0x18950820a9108a47295b40b278f243dfc5d327b5';
@@ -27,6 +29,9 @@ const networks = {
     137: 'matic',
     80001: 'mumbai'
 };
+
+// currently, Moralis plugin doesn't support protocols parameter so we will call 1inch API directly with protocol PANCAKESWAP_V2. Because without protocols parameter, the 1inch API return wrong price when the amount is <= 1 usdt due to the fee is often > 1usdt. And the important thing is the price from 1Inch without protocols parameter is average price from many dexes so and we want it to be the same with pancakeswap.
+
 
 async function init(){
     await Moralis.initPlugins();
@@ -211,28 +216,57 @@ function closeModal(){
 }
 
 async function getQuote() {
-    const amount = parseFloat($('#from_amount').val());
-    fromAmount = isNaN(amount) ? 0.00 : amount;
-    if(!currentTrade.from || !currentTrade.to || fromAmount == 0) {
-        $('#gas_estimate').text('0.00 BNB');
+    if (isFromAmountInput) {
+        const amount = parseFloat($('#from_amount').val());
+        fromAmount = isNaN(amount) ? 0.00 : amount;
+        if(!currentTrade.from || !currentTrade.to || fromAmount == 0) {
+            $('#gas_estimate').text('0.00 BNB');
+            toAmount = 0.00;
+            $('#to_amount').val('0.00');
+            return;
+        }
+        $('#gas_estimate').text("calculating...");
         toAmount = 0.00;
         $('#to_amount').val('0.00');
-        return;
-    }
-    $('#gas_estimate').text("calculating...");
-    toAmount = 0.00;
-    $('#to_amount').val('0.00');
 
-    const quote = await dex.quote({
-        chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
-        fromTokenAddress: currentTrade.from.address, // The token you want to swap
-        toTokenAddress: currentTrade.to.address, // The token you want to receive
-        amount: Moralis.Units.Token(fromAmount, currentTrade.from.decimals).toString(),
-    });
-    const estmatedGasFee = quote.estimatedGas * GAS_PRICE / 10**9;
-    $('#gas_estimate').text(Number(estmatedGasFee.toFixed(DECIMALS)) + ' BNB');
-    toAmount = quote.toTokenAmount / 10 ** currentTrade.to.decimals;
-    $('#to_amount').val(Number(toAmount.toFixed(DECIMALS)));
+        // const quote = await dex.quote({
+        //     chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
+        //     fromTokenAddress: currentTrade.from.address, // The token you want to swap
+        //     toTokenAddress: currentTrade.to.address, // The token you want to receive
+        //     amount: Moralis.Units.Token(fromAmount, currentTrade.from.decimals).toString(),
+        // });
+        const quote = await $.get(API_1INCH_BASE + `quote?fromTokenAddress=${currentTrade.from.address}&toTokenAddress=${currentTrade.to.address}&amount=${Moralis.Units.Token(fromAmount, currentTrade.from.decimals).toString()}&protocols=PANCAKESWAP_V2`);
+
+        const estmatedGasFee = quote.estimatedGas * GAS_PRICE / 10**9;
+        $('#gas_estimate').text(Number(estmatedGasFee.toFixed(DECIMALS)) + ' BNB');
+        toAmount = quote.toTokenAmount / 10 ** currentTrade.to.decimals;
+        $('#to_amount').val(Number(toAmount.toFixed(DECIMALS)));
+    } else {
+        const amount = parseFloat($('#to_amount').val());
+        toAmount = isNaN(amount) ? 0.00 : amount;
+        if(!currentTrade.from || !currentTrade.to || toAmount == 0) {
+            $('#gas_estimate').text('0.00 BNB');
+            fromAmount = 0.00;
+            $('#from_amount').val('0.00');
+            return;
+        }
+        $('#gas_estimate').text("calculating...");
+        fromAmount = 0.00;
+        $('#from_amount').val('0.00');
+
+        // const quote = await dex.quote({
+        //     chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
+        //     fromTokenAddress: currentTrade.from.address, // The token you want to swap
+        //     toTokenAddress: currentTrade.to.address, // The token you want to receive
+        //     amount: Moralis.Units.Token(1, currentTrade.from.decimals).toString(),
+        // });
+        const quote = await $.get(API_1INCH_BASE + `quote?fromTokenAddress=${currentTrade.from.address}&toTokenAddress=${currentTrade.to.address}&amount=${Moralis.Units.Token(1, currentTrade.from.decimals).toString()}&protocols=PANCAKESWAP_V2`);
+        console.log(quote);
+        const estmatedGasFee = quote.estimatedGas * GAS_PRICE / 10**9;
+        $('#gas_estimate').text(Number(estmatedGasFee.toFixed(DECIMALS)) + ' BNB');
+        fromAmount = toAmount / (quote.toTokenAmount / 10 ** currentTrade.to.decimals);
+        $('#from_amount').val(Number(fromAmount.toFixed(DECIMALS)));
+    }
 }
 
 async function trySwap(){
@@ -286,9 +320,13 @@ function exchangeToken() {
     } else {
         delete currentTrade['from'];
     }
-    const tempToAmount = toAmount;
-    toAmount = fromAmount;
-    fromAmount = tempToAmount;
+    if (isFromAmountInput) {
+        $('#to_amount').val(fromAmount);
+    } else {
+        $('#from_amount').val(toAmount);
+    }
+    isFromAmountInput = !isFromAmountInput;
+    getQuote();
     renderSwapInfo();
 }
 
@@ -300,6 +338,13 @@ document.getElementById("to_token_select").onclick = (() => {openModal("to")});
 document.getElementById("login_button").onclick = login;
 document.getElementById("logout_button").onclick = logOut;
 document.getElementById("btn_exchange").onclick = exchangeToken;
-document.getElementById("from_amount").onkeyup = getQuote;
+document.getElementById("from_amount").onkeyup = () => {
+    isFromAmountInput = true;
+    getQuote();
+};
+document.getElementById("to_amount").onkeyup = () => {
+    isFromAmountInput = false;
+    getQuote();
+};
 document.getElementById("swap_button").onclick = trySwap;
 document.getElementById("token_search_input").onkeyup = filterTokens;
