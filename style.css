@@ -61,7 +61,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .swapbox_select{
-    width: 50%;
+    width: 60%;
     float: left;
 }
 
@@ -74,10 +74,18 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px rgb(51, 51, 51);
 }
 
+@media screen and (max-width: 767px) {
+    #window {
+        margin-left: 10px;
+        margin-right: 10px;
+        margin-top: 20px
+    }
+}
+
 .token_select{
     padding:5px 0;
     border-radius: 500px;
-    max-width: 50%;
+    max-width: 40%;
 }
 
 .token_select:hover{
