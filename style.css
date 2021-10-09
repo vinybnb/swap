@@ -50,7 +50,6 @@ h1, h2, h3, h4, h5, h6 {
     background-image: url(../images/blob1.png);
     background-repeat: no-repeat;
     background-size: cover;
-    overflow: hidden;
 }
 
 .swap_text{
@@ -220,4 +219,13 @@ h1, h2, h3, h4, h5, h6 {
 
 #btn_exchange:focus {
     outline: none;
+}
+
+.btn-max {
+    border-color: #ced4da;
+    background-color: #F037A5;
+
+}
+.btn-max:hover, .btn-max:focus {
+    background-color: #F037A5;
 }

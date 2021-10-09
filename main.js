@@ -8,6 +8,7 @@ let currentSelectSide;
 let tokens;
 let user;
 let balances = {};
+let tokenInBalance = 0.0;
 let fromAmount = 0.00;
 let toAmount = 0.00
 const DECIMALS = 8;
@@ -144,7 +145,7 @@ async function renderSwapInfo() {
     if(currentTrade.from){
         document.getElementById("from_token_img").src = currentTrade.from.logoURI;
         document.getElementById("from_token_text").innerHTML = currentTrade.from.symbol;
-        let tokenInBalance = 0;
+        tokenInBalance = 0;
         if (balances[currentTrade.from.address] !== undefined) {
             tokenInBalance = balances[currentTrade.from.address].balance / (10 ** balances[currentTrade.from.address].decimals) || 0;
         }
@@ -261,7 +262,6 @@ async function getQuote() {
         //     amount: Moralis.Units.Token(1, currentTrade.from.decimals).toString(),
         // });
         const quote = await $.get(API_1INCH_BASE + `quote?fromTokenAddress=${currentTrade.from.address}&toTokenAddress=${currentTrade.to.address}&amount=${Moralis.Units.Token(1, currentTrade.from.decimals).toString()}&protocols=PANCAKESWAP_V2`);
-        console.log(quote);
         const estmatedGasFee = quote.estimatedGas * GAS_PRICE / 10**9;
         $('#gas_estimate').text(Number(estmatedGasFee.toFixed(DECIMALS)) + ' BNB');
         fromAmount = toAmount / (quote.toTokenAmount / 10 ** currentTrade.to.decimals);
@@ -297,6 +297,8 @@ async function trySwap(){
             fromAddress: address, // Your wallet address
             slippage: Number($('#slippage').text()),
         });
+        // const receipt = await $.get(API_1INCH_BASE + `swap?fromAddress=${user.get('ethAddress')}&fromTokenAddress=${currentTrade.from.address}&toTokenAddress=${currentTrade.to.address}&amount=${Moralis.Units.Token(1, currentTrade.from.decimals).toString()}&slippage=${Number($('#slippage').text())}&protocols=PANCAKESWAP_V2`);
+        // console.log(receipt);
         $('.receipt-body').text(`Swap ${fromAmount} ${currentTrade.from.symbol} for ${toAmount} ${currentTrade.to.symbol}`);
         $('.receipt-link a').prop('href', 'https://bscscan.com/tx/' + receipt.transactionHash);
         $('#swap_button').text('Begin Swap');
@@ -329,6 +331,11 @@ function exchangeToken() {
     getQuote();
     renderSwapInfo();
 }
+
+$('.btn-max').on('click', function () {
+    $('#from_amount').val(tokenInBalance);
+    $('#from_amount').keyup();
+});
 
 init();
 
