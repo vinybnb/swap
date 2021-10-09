@@ -295,7 +295,7 @@ async function trySwap(){
             toTokenAddress: currentTrade.to.address, // The token you want to receive
             amount: Moralis.Units.Token(fromAmount, currentTrade.from.decimals).toString(),
             fromAddress: address, // Your wallet address
-            slippage: parseInt($('#slippage').text()),
+            slippage: Number($('#slippage').text()),
         });
         $('.receipt-body').text(`Swap ${fromAmount} ${currentTrade.from.symbol} for ${toAmount} ${currentTrade.to.symbol}`);
         $('.receipt-link a').prop('href', 'https://bscscan.com/tx/' + receipt.transactionHash);
