@@ -94,7 +94,7 @@ h1, h2, h3, h4, h5, h6 {
     cursor: pointer;
 }
 
-.modal-body{
+#token_modal .modal-body {
     height: 500px;
     overflow: scroll;
 }
@@ -239,5 +239,100 @@ h1, h2, h3, h4, h5, h6 {
 .btn-max:hover, .btn-max:focus, .btn-max::selection {
     background-color: #F037A5;
     border-color: #FFF;
+    color: #FFF;
+}
+
+#wallets_modal .modal-dialog {
+    overflow: hidden;
+    background: rgb(255, 255, 255);
+    box-shadow: rgb(14 14 44 / 10%) 0px 20px 36px -8px, rgb(0 0 0 / 5%) 0px 1px 1px;
+    border: 1px solid rgb(231, 227, 235);
+    border-radius: 32px;
+    width: 100%;
+    max-height: 100vh;
+    z-index: 100;
+}
+
+#wallets_modal .modal-header {
+    -webkit-box-align: center;
+    align-items: center;
+    /* background: linear-gradient(139.73deg, rgb(229, 253, 255) 0%, rgb(243, 239, 255) 100%); */
+    background: linear-gradient(45deg, #2D46B9, #F037A5);
+    /* border-bottom: 1px solid rgb(231, 227, 235); */
+    display: flex;
+    padding: 16px 24px;
+}
+
+#wallets_modal h5 {
+    font-size: 18px;
+    color: #FFF;
+}
+
+#wallets_modal .modal-body {
+    padding-top: 50px;
+}
+
+#wallets_modal .modal-dialog {
+    max-width: 340px;
+    border: none;
+}
+
+#wallets_modal .modal-content {
+    border: none;
+}
+
+#wallets_modal .modal-body .row {
+    margin-bottom: 50px;
+}
+
+.btn-wallet {
+    -webkit-box-align: center;
+    align-items: center;
+    border: 0px;
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    -webkit-box-pack: center;
+    justify-content: center;
+    letter-spacing: 0.03em;
+    line-height: 1;
+    opacity: 1;
+    outline: 0px;
+    transition: background-color 0.2s ease 0s, opacity 0.2s ease 0s;
+    height: 48px;
+    background-color: transparent;
+    color: rgb(31, 199, 212);
+    box-shadow: none;
+    width: 100%;
+}
+
+.btn-wallet:hover {
+    opacity: 0.8;
+}
+
+.wallet-text {
+    color: rgb(40, 13, 95);
+    font-weight: 600;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.svg-viewbox {
+    align-self: center;
+    fill: rgb(40, 13, 95);
+    flex-shrink: 0;
+    margin-bottom: 8px;
+}
+
+#wallets_modal button:focus {
+    outline: 0;
+}
+
+#wallets_modal .close {
+    margin-top: -30px;
     color: #FFF;
 }

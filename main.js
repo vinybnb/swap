@@ -39,7 +39,6 @@ setInterval(function(){
 
 async function init(){
     await Moralis.initPlugins();
-    await Moralis.enable();
     dex = Moralis.Plugins.oneInch;
     await listAvailableTokens();
     renderInterface();
@@ -111,11 +110,11 @@ async function renderInterface() {
     user = Moralis.User.current();
     if (user) {
         document.getElementById("swap_button").disabled = false;
-        document.getElementById("login_button").hidden = true;
+        document.getElementById("connect_wallet_button").hidden = true;
         document.getElementById("logout_button").hidden = false;
         $('#address').text(shortenAddress(user.get("ethAddress")));
         $('#address').show(user.get("ethAddress"));
-        web3 = await Moralis.enable();
+        // web3 = await Moralis.enable();
         networkId = await Moralis.web3.eth.net.getId();
         if (networkId != MAINNET_ID) {
             alert('Please switch to Binance Smart Chain Wallet');
@@ -125,7 +124,7 @@ async function renderInterface() {
         }
     } else {
         document.getElementById("swap_button").disabled = true;
-        document.getElementById("login_button").hidden = false;
+        document.getElementById("connect_wallet_button").hidden = false;
         document.getElementById("logout_button").hidden = true;
         $('#address').text('');
         $('#address').hide();
@@ -196,12 +195,21 @@ function shortenAddress(address) {
     return address.substring(0, 6) + '...' + address.substring(address.length - 5, address.length);
 }
 
-async function login() {
-    user = Moralis.User.current();
+async function connectWallet(provider) {
+    let user = Moralis.User.current();
     if (!user) {
-        user = await Moralis.Web3.authenticate();
+        switch (provider) {
+            case 'metamask':
+                user = await Moralis.authenticate();
+                break;
+            case 'walletconnect':
+                user = await Moralis.authenticate({ provider: provider });
+                break;
+            default:
+                break;
+        }
     }
-  
+    $('#wallets_modal').modal('hide');
     renderInterface();
 }
 
@@ -344,7 +352,6 @@ init();
 document.getElementById("modal_close").onclick = closeModal;
 document.getElementById("from_token_select").onclick = (() => {openModal("from")});
 document.getElementById("to_token_select").onclick = (() => {openModal("to")});
-document.getElementById("login_button").onclick = login;
 document.getElementById("logout_button").onclick = logOut;
 document.getElementById("btn_exchange").onclick = exchangeToken;
 document.getElementById("from_amount").onkeyup = () => {
