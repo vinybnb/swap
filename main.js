@@ -197,6 +197,7 @@ function shortenAddress(address) {
 
 async function connectWallet(provider) {
     let user = Moralis.User.current();
+    $('#wallets_modal').modal('hide');
     if (!user) {
         switch (provider) {
             case 'metamask':
@@ -209,7 +210,6 @@ async function connectWallet(provider) {
                 break;
         }
     }
-    $('#wallets_modal').modal('hide');
     renderInterface();
 }
 
