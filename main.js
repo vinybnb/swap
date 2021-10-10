@@ -1,8 +1,6 @@
 Moralis.initialize("QMLoVdfDAzpL4S4xoRyEtuhKjpO7fsJJLosljwm5");
 Moralis.serverURL = "https://jms66zb8h4zr.moralishost.com:2053/server";
 
-const chainToQuery = 'bsc'
-
 let currentTrade = {};
 let currentSelectSide;
 let tokens;
@@ -11,15 +9,15 @@ let balances = {};
 let tokenInBalance = 0.0;
 let fromAmount = 0.00;
 let toAmount = 0.00
-const DECIMALS = 8;
 let isFromAmountInput = true; // true if user input on "from amount", false if user input on "to amount"
+let dex;
+let web3;
+const DECIMALS = 8;
 const API_1INCH_BASE = "https://api.1inch.exchange/v3.0/56/";
 const NATIVE_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 const WBNB_ADDRESS = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
 const CASH_ADDRESS = '0x18950820a9108a47295b40b278f243dfc5d327b5';
 const USDT_ADDRESS = '0x55d398326f99059ff775485246999027b3197955';
-let dex;
-let web3;
 const MAINNET_ID = 56; // 56 for mainnet
 const GAS_PRICE = 5.8; // Gwei
 const networks = {
@@ -215,7 +213,8 @@ async function connectWallet(provider) {
                 break;
         }
     }
-    renderInterface();
+    await renderInterface();
+    renderSwapInfo();
 }
 
 async function enabledMoralisWeb3() {
@@ -233,7 +232,19 @@ async function enabledMoralisWeb3() {
 async function logOut() {
     await Moralis.User.logOut();
     window.localStorage.removeItem('provider');
-    renderInterface();
+    reset();
+    await renderInterface();
+    renderSwapInfo();
+}
+
+function reset() {
+    currentTrade = {from: tokens[NATIVE_ADDRESS], to: tokens[CASH_ADDRESS]};
+    currentSelectSide = null;
+    balances = {};
+    tokenInBalance = 0.0;
+    fromAmount = 0.00;
+    toAmount = 0.00
+    isFromAmountInput = true;
 }
 
 function openModal(side){
