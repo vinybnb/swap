@@ -114,7 +114,7 @@ async function renderInterface() {
         document.getElementById("logout_button").hidden = false;
         $('#address').text(shortenAddress(user.get("ethAddress")));
         $('#address').show(user.get("ethAddress"));
-        web3 = await Moralis.enable();
+        await enabledMoralisWeb3();
         networkId = await Moralis.web3.eth.net.getId();
         if (networkId != MAINNET_ID) {
             alert('Please switch to Binance Smart Chain Wallet');
@@ -202,9 +202,11 @@ async function connectWallet(provider) {
         switch (provider) {
             case 'metamask':
                 user = await Moralis.authenticate();
+                window.localStorage.setItem('provider', 'metamask');
                 break;
             case 'walletconnect':
                 user = await Moralis.authenticate({ provider: provider });
+                window.localStorage.setItem('provider', 'walletconnect');
                 break;
             default:
                 break;
@@ -213,8 +215,21 @@ async function connectWallet(provider) {
     renderInterface();
 }
 
+async function enabledMoralisWeb3() {
+    const provider = window.localStorage.getItem('provider');
+    switch (provider) {
+        case 'walletconnect':
+            web3 = await Moralis.enable({ provider: provider });
+            break;
+        default:
+            web3 = await Moralis.enable();
+            break;
+    }
+}
+
 async function logOut() {
     await Moralis.User.logOut();
+    window.localStorage.removeItem('provider');
     renderInterface();
 }
 
@@ -322,7 +337,6 @@ async function trySwap(){
 
 function formatNumber(number) {
     if (!isNaN(number)) {
-        console.log(number);
         number = number.toString();
     }
     const dotPosition = number.indexOf('.');
