@@ -41,7 +41,10 @@ async function init(){
     await Moralis.initPlugins();
     dex = Moralis.Plugins.oneInch;
     await listAvailableTokens();
-    renderInterface();
+    await renderInterface();
+    currentTrade.from = tokens[NATIVE_ADDRESS];
+    currentTrade.to = tokens[CASH_ADDRESS];
+    renderSwapInfo();
     const options = {
         delay: 30000,
     };
@@ -120,7 +123,7 @@ async function renderInterface() {
             alert('Please switch to Binance Smart Chain Wallet');
             logOut();
         } else {
-            getBalances();
+            await getBalances();
         }
     } else {
         document.getElementById("swap_button").disabled = true;
@@ -142,7 +145,7 @@ function filterTokens() {
     showTokensList(filteredTokens);
 }
 
-async function renderSwapInfo() {
+function renderSwapInfo() {
     if(currentTrade.from){
         document.getElementById("from_token_img").src = currentTrade.from.logoURI;
         document.getElementById("from_token_text").innerHTML = currentTrade.from.symbol;
