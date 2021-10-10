@@ -227,7 +227,7 @@ h1, h2, h3, h4, h5, h6 {
 
 #btn_exchange {
     padding-left: 4px;
-    margin-bottom: -10px;
+    margin-bottom: 0;
     border-radius: 12px;
     height: 36px;
     width: 36px;
