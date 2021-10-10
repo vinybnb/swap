@@ -12,6 +12,22 @@
 
 body {
     font-family: 'PlusJakartaSansRegular', Helvetica, Arial, sans-serif;
+    overflow-y: hidden;
+    background-image: url(../images/bg.png);
+    background-position: top center;
+    background-repeat: no-repeat;
+}
+
+.container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.container .row {
+    width: 100%;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -44,13 +60,6 @@ h1, h2, h3, h4, h5, h6 {
 #logout_button{
     margin-left: 10px;
     margin-right: 0px;
-}
-
-#blob_1{
-    background-image: url(../images/blob1.png);
-    background-repeat: no-repeat;
-    background-size: cover;
-    overflow: hidden;
 }
 
 .swap_text{
@@ -274,6 +283,7 @@ h1, h2, h3, h4, h5, h6 {
 
 #wallets_modal .modal-dialog {
     max-width: 340px;
+    min-width: 340px;
     border: none;
 }
 
