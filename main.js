@@ -114,7 +114,7 @@ async function renderInterface() {
         document.getElementById("logout_button").hidden = false;
         $('#address').text(shortenAddress(user.get("ethAddress")));
         $('#address').show(user.get("ethAddress"));
-        // web3 = await Moralis.enable();
+        web3 = await Moralis.enable();
         networkId = await Moralis.web3.eth.net.getId();
         if (networkId != MAINNET_ID) {
             alert('Please switch to Binance Smart Chain Wallet');
@@ -151,7 +151,7 @@ async function renderSwapInfo() {
             tokenInBalance = balances[currentTrade.from.address].balance / (10 ** balances[currentTrade.from.address].decimals) || 0;
         }
         tokenInBalance = Number(tokenInBalance.toFixed(DECIMALS));
-        $('#token_in_balance').text(`${tokenInBalance} ${currentTrade.from.symbol}`);
+        $('#token_in_balance').text(`${formatNumber(tokenInBalance)} ${currentTrade.from.symbol}`);
     } else {
         $('#from_token_select').html('<img class="token_image" id="from_token_img"> <span id="from_token_text"></span>');
         $('#token_in_balance').text('0.00');
@@ -165,13 +165,13 @@ async function renderSwapInfo() {
             tokenOutBalance = balances[currentTrade.to.address].balance / (10 ** balances[currentTrade.to.address].decimals) || 0;
         }
         tokenOutBalance = Number(tokenOutBalance.toFixed(DECIMALS));
-        $('#token_out_balance').text(`${tokenOutBalance} ${currentTrade.to.symbol}`);
+        $('#token_out_balance').text(`${formatNumber(tokenOutBalance)} ${currentTrade.to.symbol}`);
     } else {
         $('#to_token_select').html('<img class="token_image" id="to_token_img"> <span id="to_token_text"></span>');
         $('#token_out_balance').text('0.00');
     }
-    $('#from_amount').val(Number(fromAmount.toFixed(DECIMALS)));
-    $('#to_amount').val(Number(toAmount.toFixed(DECIMALS)));
+    $('#from_amount').val(formatNumber(Number(fromAmount.toFixed(DECIMALS))));
+    $('#to_amount').val(formatNumber(Number(toAmount.toFixed(DECIMALS))));
 }
 
 async function updateTokenBalance() {
@@ -251,7 +251,7 @@ async function getQuote() {
         const estmatedGasFee = quote.estimatedGas * GAS_PRICE / 10**9;
         $('#gas_estimate').text(Number(estmatedGasFee.toFixed(DECIMALS)) + ' BNB');
         toAmount = quote.toTokenAmount / 10 ** currentTrade.to.decimals;
-        $('#to_amount').val(Number(toAmount.toFixed(DECIMALS)));
+        $('#to_amount').val(formatNumber(Number(toAmount.toFixed(DECIMALS))));
     } else {
         const amount = parseFloat($('#to_amount').val());
         toAmount = isNaN(amount) ? 0.00 : amount;
@@ -275,7 +275,7 @@ async function getQuote() {
         const estmatedGasFee = quote.estimatedGas * GAS_PRICE / 10**9;
         $('#gas_estimate').text(Number(estmatedGasFee.toFixed(DECIMALS)) + ' BNB');
         fromAmount = toAmount / (quote.toTokenAmount / 10 ** currentTrade.to.decimals);
-        $('#from_amount').val(Number(fromAmount.toFixed(DECIMALS)));
+        $('#from_amount').val(formatNumber(Number(fromAmount.toFixed(DECIMALS))));
     }
 }
 
@@ -320,6 +320,21 @@ async function trySwap(){
     }
 }
 
+function formatNumber(number) {
+    if (!isNaN(number)) {
+        console.log(number);
+        number = number.toString();
+    }
+    const dotPosition = number.indexOf('.');
+    if (dotPosition === -1) {
+        return number + '.00';
+    } else if (dotPosition === number.length - 2) {
+        return number + '0';
+    }
+
+    return number;
+}
+
 function exchangeToken() {
     const currentTradeTo = currentTrade.to ? Object.assign({}, currentTrade.to) : null;
     if(currentTrade.from) {
@@ -333,9 +348,9 @@ function exchangeToken() {
         delete currentTrade['from'];
     }
     if (isFromAmountInput) {
-        $('#to_amount').val(fromAmount);
+        $('#to_amount').val(formatNumber(fromAmount));
     } else {
-        $('#from_amount').val(toAmount);
+        $('#from_amount').val(formatNumber(toAmount));
     }
     isFromAmountInput = !isFromAmountInput;
     getQuote();
