@@ -10,9 +10,10 @@
           url('fonts/PlusJakartaSans-Regular.woff') format('woff');
 }
 
-body {
+html, body {
     font-family: 'PlusJakartaSansRegular', Helvetica, Arial, sans-serif;
     overflow-y: hidden;
+    position: relative;
     background-image: url(../images/bg.png);
     background-position: top center;
     background-repeat: no-repeat;
