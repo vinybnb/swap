@@ -205,6 +205,10 @@ async function connectWallet(provider) {
                 user = await Moralis.authenticate();
                 window.localStorage.setItem('provider', 'metamask');
                 break;
+            case 'trustwallet':
+                user = await Moralis.authenticate();
+                window.localStorage.setItem('provider', 'trustwallet');
+                break;
             case 'walletconnect':
                 user = await Moralis.authenticate({ provider: provider });
                 window.localStorage.setItem('provider', 'walletconnect');
