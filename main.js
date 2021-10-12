@@ -1,5 +1,4 @@
-Moralis.initialize("QMLoVdfDAzpL4S4xoRyEtuhKjpO7fsJJLosljwm5");
-Moralis.serverURL = "https://jms66zb8h4zr.moralishost.com:2053/server";
+Moralis.start({ serverUrl: "https://jms66zb8h4zr.moralishost.com:2053/server", appId: "QMLoVdfDAzpL4S4xoRyEtuhKjpO7fsJJLosljwm5" });
 
 let currentTrade = {};
 let currentSelectSide;
