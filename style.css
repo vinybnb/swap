@@ -363,3 +363,63 @@ h1, h2, h3, h4, h5, h6 {
 .logo img {
     margin-top: -10px;
 }
+
+.refer_balance {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.refer_description {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.refer .nav-pills .nav-link.active, .refer .nav-pills .show > .nav-link {
+    background-color: #2D46B9;
+}
+
+.refer .nav-item a {
+    color: #2D46B9
+}
+
+.stepper .line {
+    width: 2px;
+    background-color: lightgrey !important;
+}
+
+.stepper .lead {
+    font-size: 1.1rem;
+}
+
+.bg-pink {
+    background-color: #F037A5;
+}
+
+.bg-blue {
+    background-color: #2D46B9;
+}
+
+.text-pink {
+    color: #F037A5;
+}
+
+.text-blue {
+    color: #2D46B9;
+}
+
+.text-bold {
+    font-weight: bold;
+}
+
+.referral_link {
+    display: flex;
+}
+
+.btn-copy {
+    cursor: pointer;
+}
+
+.referral_link input:read-only {
+    background-color: #F037A5;
+    color: #FFF;
+}
