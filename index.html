@@ -21,27 +21,29 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-            </li>
-            <a class="nav-link" href="#">Swap <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link" href="https://caash.io/pools">Pools</a>
-        </li>
-            <li class="nav-item active">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="javascript:void(0)">Swap <span class="sr-only">(current)</span></a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a class="nav-link" href="https://swap.caash.io">Refer</a>
+                </li> -->
+                <li class="nav-item">
+                    <a class="nav-link" href="https://caash.io/pools">Pools</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="https://www.caash.io/local">Local</a>
-            <li class="nav-item active">
-                <a class="nav-link" href="https://www.caash.io/wallet/">Wallet</a>
-            </li>
-        <li class="nav-item active">
-                <a class="nav-link" href="https://www.caash.me/">Me</a>
-        </li>
-          </ul>
-          <label class="my-2 my-sm-0 cash-price"><img src="/images/caash.webp" alt="$CASH"> $<span id="cash_price">0.00</span></span></label>
-          <label id="address" class="my-2 my-sm-0"></label>
-          <button id="connect_wallet_button" class="btn btn-outline-primary my-2 my-sm-0" data-toggle="modal" data-target="#wallets_modal">Connect Wallet</button>
-          <button id="logout_button" class="btn btn-outline-primary my-2 my-sm-0" onclick="logOut()">Disconnect</button>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://www.caash.io/wallet/">Wallet</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://www.caash.me/">Me</a>
+                </li>
+            </ul>
+            <label class="my-2 my-sm-0 cash-price"><img src="/images/caash.webp" alt="$CASH"> $<span id="cash_price">0.00</span></span></label>
+            <label id="address" class="my-2 my-sm-0"></label>
+            <button id="connect_wallet_button" class="btn btn-outline-primary my-2 my-sm-0" data-toggle="modal" data-target="#wallets_modal">Connect Wallet</button>
+            <button id="logout_button" class="btn btn-outline-primary my-2 my-sm-0" onclick="logOut()">Disconnect</button>
         </div>
     </nav>
     <div class="container">
