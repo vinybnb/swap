@@ -11,7 +11,7 @@ let toAmount = 0.00
 let isFromAmountInput = true; // true if user input on "from amount", false if user input on "to amount"
 let dex;
 let web3;
-const DECIMALS = 8;
+const DECIMALS = 5;
 const API_1INCH_BASE = "https://api.1inch.exchange/v3.0/56/";
 const NATIVE_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 const WBNB_ADDRESS = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
