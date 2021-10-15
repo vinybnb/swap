@@ -62,12 +62,11 @@
     <div class="container">
         <div class="row">
             <div class="col col-md-6 offset-md-3 refer" id="window">
-                <h3 class="refer_balance text-blue">10.50 $CASH</h3>
-                <div class="refer_description text-blue text-bold">Refer a friend to trade on swap.caash.io and earn $CASH for every trade
-                    they do.</div>
+                <h3 class="refer_balance text-dark">10.50 $CASH</h3>
+                <div class="refer_description text-dark text-bold pl-1 pr-1">Refer friends to trade on Caash Swap and earn on every trade</div>
                 <ul class="nav nav-pills nav-fill">
                     <li class="nav-item">
-                        <a class="nav-link active" href="javascript:void(0)">Refer token</a>
+                        <a class="nav-link active" href="javascript:void(0)">Refer</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)">Rewards</a>
@@ -80,7 +79,7 @@
                             <div class="line h-50"></div>
                         </div>
                         <div>
-                            <h6 class="text-blue pt-2">Generate your referral link</h6>
+                            <p class="text-dark pt-2">Copy your referral link</p>
                             <p class="lead text-muted pb-1"></p>
                         </div>
                     </div>
@@ -90,7 +89,7 @@
                             <div class="line h-50"></div>
                         </div>
                         <div>
-                            <h6 class="text-blue pt-2">Invite your friends to trade</h6>
+                            <p class="text-dark pt-2">Invite your friends</p>
                             <p class="lead text-muted pb-1"></p>
                         </div>
                     </div>
@@ -100,14 +99,18 @@
                             <div class="line h-50 d-none"></div>
                         </div>
                         <div>
-                            <h6 class="text-blue pt-2">Get 0.1% of any trade for life!</h6>
+                            <p class="text-dark pt-2">Earn 0.1% of all trades</p>
                             <p class="lead text-muted"></p>
                         </div>
                     </div>
-                    <div class="text-blue mt-2 mb-2 text-bold">Share referral link</div>
-                    <div class="referral_link">
-                        <input type="text" class="form-control" readonly value="https://swap.cash.io?ref=vn04Yr">
-                        <i class="fa fa-copy fa-2x btn-copy text-blue ml-3 mt-1"></i>
+                    <button id="refer_not_connected" class="btn btn-outline-primary my-2 my-sm-0" data-toggle="modal"
+                data-target="#wallets_modal">Connect wallet to get referral link</button>
+                    <div id="refer_connected">
+                        <div class="text-dark mt-2 mb-2 text-bold">Share referral link</div>
+                        <div class="referral_link">
+                            <input id="ref" type="text" class="form-control" readonly value="">
+                            <i class="fa fa-copy fa-2x btn-copy text-blue ml-3 mt-1"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -252,7 +255,7 @@
     </div>
     <script
         src="https://github.com/WalletConnect/walletconnect-monorepo/releases/download/1.6.2/web3-provider.min.js"></script>
-    <script type="text/javascript" src="./main.js?v=1.4"></script>
+    <script type="text/javascript" src="./referral.js?v=1.0"></script>
     <!--  Start of LiveChat (www.livechatinc.com) code  -->
     <script>
         window.__lc = window.__lc || {};
