@@ -48,6 +48,10 @@ async function init(){
     $('.toast').toast(options);
 }
 
+$('.toast').on('hidden.bs.toast', function () {
+    $('.toast-container').css("z-index", "-1");
+});
+
 async function listAvailableTokens(){
     const result = await dex.getSupportedTokens({
         chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
@@ -346,6 +350,7 @@ async function trySwap(){
         $('#swap_button').text('Begin Swap');
         $('#swap_button').prop('disabled', false);
         await updateTokenBalance();
+        $('.toast-container').css("z-index", "1");
         $('.toast').toast('show');
     } catch (error) {
         console.log(error);
