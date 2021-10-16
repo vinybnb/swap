@@ -74,6 +74,18 @@ Moralis.Cloud.define("setReference", async (request) => {
     return { "status": "error", "message": "User not found" };
 });
 
+Moralis.Cloud.define("getReward", async (request) => {
+    const User = Moralis.Object.extend("User");
+    const query = new Moralis.Query(User);
+    query.equalTo("ethAddress", request.params.address);
+    const user = await query.first({ useMasterKey: true });
+    if (user && user.attributes.reward) {
+        return { "status": "success", "reward": user.attributes.reward };
+    }
+
+    return { "status": "success", "reward": 0 };
+});
+
 function makeid(length) {
     let result = '';
     let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

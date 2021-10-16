@@ -76,6 +76,8 @@ async function renderInterface() {
             $('.info-toast-container .toast').toast('show');
             logOut();
         } else {
+            const reward = await getReward();
+            $('#reward').text(formatNumber(Number(reward.toFixed(DECIMALS))));
             const results = await Moralis.Cloud.run("getRef", { address: user.get("ethAddress") });
             if (results.status == 'success') {
                 ref = results.ref;
@@ -122,6 +124,15 @@ async function connectWallet(provider) {
     await renderInterface();
 }
 
+async function getReward() {
+    const results = await Moralis.Cloud.run("getReward", { address: user.get("ethAddress") });
+    if (results.status == 'success') {
+        return results.reward;
+    }
+
+    return 0;
+}
+
 async function enabledMoralisWeb3() {
     const provider = window.localStorage.getItem('provider');
     switch (provider) {
@@ -153,6 +164,20 @@ function copy() {
 
     $('.copy-toast-container').css("z-index", "1");
     $('.copy-toast-container .toast').toast('show');
+}
+
+function formatNumber(number) {
+    if (!isNaN(number)) {
+        number = number.toString();
+    }
+    const dotPosition = number.indexOf('.');
+    if (dotPosition === -1) {
+        return number + '.00';
+    } else if (dotPosition === number.length - 2) {
+        return number + '0';
+    }
+
+    return number;
 }
 
 init();
