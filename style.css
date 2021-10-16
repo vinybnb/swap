@@ -168,7 +168,7 @@ h1, h2, h3, h4, h5, h6 {
     padding-top: 3px;
 }
 
-.toast {
+.toast-container .toast {
     border-radius: 20px;
     width: 400px;
     max-width: 400px;
@@ -417,4 +417,28 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-copy {
     cursor: pointer;
+}
+
+.copy-toast-container {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 20px;
+}
+
+.copy-toast-container .toast {
+    border-radius: 20px;
+    width: 100px;
+    max-width: 100px;
+    margin: 0 auto;
+    background: transparent;
+}
+
+.copy-toast-container i {
+    color: #28A745;
+    margin-right: 5px;
+}
+
+.copy-toast-container .toast-header {
+    background-color: transparent;
+    border: none;
 }
