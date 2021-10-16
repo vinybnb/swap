@@ -21,14 +21,57 @@ Moralis.Cloud.define("getRef", async (request) => {
                 if (!refs.includes(ref)) {
                     user.set('ref', ref);
                     user.save(null, { useMasterKey: true });
-                    
+
                     return { "status": "success", "ref": ref };
                 }
             } while (true);
         }
-    } else {
-        return { "status": "error", "message": "Cannot found user" };
     }
+
+    return { "status": "error", "message": "User not found" };
+});
+
+Moralis.Cloud.define("getReference", async (request) => {
+    const User = Moralis.Object.extend("User");
+    const query = new Moralis.Query(User);
+    query.equalTo("ethAddress", request.params.address);
+    const user = await query.first({ useMasterKey: true });
+    if (user && user.attributes.reference) {
+        return { "status": "success", "reference": user.attributes.reference };
+    }
+
+    return { "status": "success", "reference": null };
+});
+
+Moralis.Cloud.define("setReference", async (request) => {
+    if (!request.params.reference) {
+        return { "status": "error", "message": "Empty reference" };
+    }
+    const User = Moralis.Object.extend("User");
+    const query = new Moralis.Query(User);
+    query.equalTo("ethAddress", request.params.address);
+    const user = await query.first({ useMasterKey: true });
+    if (user) {
+        if (user.attributes.reference) {
+            // return current reference in the DB, no matter what the value of the reference param is
+            return { "status": "success", "reference": user.attributes.reference };
+        }
+        // check there is a ref value in the DB equals to the reference param, if yes, we will update this value. Otherwise, we will return error
+        // we also prevent user to set himeself as the reference
+        const refsQuery = new Moralis.Query(User);
+        refsQuery.equalTo("ref", request.params.reference);
+        const referenceUser = await refsQuery.first({ useMasterKey: true });
+        if (referenceUser && request.params.reference != user.attributes.ref) {
+            user.set('reference', request.params.reference);
+            user.save(null, { useMasterKey: true });
+            
+            return { "status": "success", "reference": request.params.reference };
+        }
+        
+        return { "status": "error", "message": "Invalid reference" };
+    }
+
+    return { "status": "error", "message": "User not found" };
 });
 
 function makeid(length) {

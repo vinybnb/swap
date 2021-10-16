@@ -34,7 +34,8 @@ setInterval(function(){
     loadCashPrice();
 }, 5000);
 
-async function init(){
+async function init() {
+    storeReference();
     await Moralis.initPlugins();
     dex = Moralis.Plugins.oneInch;
     await listAvailableTokens();
@@ -60,6 +61,14 @@ $('.toast-container .toast').on('hidden.bs.toast', function () {
 $('.info-toast-container .toast').on('hidden.bs.toast', function () {
     $('.info-toast-container').css("z-index", "-1");
 });
+
+function storeReference() {
+    const url = new URL(window.location.href);
+    reference = url.searchParams.get("ref");
+    if (reference) {
+        window.localStorage.setItem('reference', reference);
+    }
+}
 
 async function listAvailableTokens(){
     const result = await dex.getSupportedTokens({
@@ -136,6 +145,15 @@ async function renderInterface() {
             logOut();
         } else {
             await getBalances();
+            let reference = await getReference();
+            if (!reference && window.localStorage.getItem('reference')) {
+                const results = await Moralis.Cloud.run("setReference", { address: user.get("ethAddress"), reference: window.localStorage.getItem('reference') });
+                if (results.status == 'success') {
+                    window.localStorage.setItem('reference', results.reference);
+                } else {
+                    window.localStorage.removeItem('reference');
+                }
+            }
         }
     } else {
         document.getElementById("swap_button").disabled = true;
@@ -144,6 +162,17 @@ async function renderInterface() {
         $('#address').text('');
         $('#address').hide();
     }
+}
+
+async function getReference() {
+    const results = await Moralis.Cloud.run("getReference", { address: user.get("ethAddress") });
+    if (results.status == 'success') {
+        const reference = results.reference;
+
+        return reference;
+    }
+
+    return '';
 }
 
 function filterTokens() {
@@ -250,6 +279,7 @@ async function enabledMoralisWeb3() {
 async function logOut() {
     await Moralis.User.logOut();
     window.localStorage.removeItem('provider');
+    window.localStorage.removeItem('reference');
     reset();
     await renderInterface();
     renderSwapInfo();
