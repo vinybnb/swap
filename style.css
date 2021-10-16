@@ -218,6 +218,10 @@ h1, h2, h3, h4, h5, h6 {
     margin-right: 20px;
 }
 
+.toast-container button:focus {
+    outline: none;
+}
+
 .toast-container h6 {
     margin-top: 15px;
 }
@@ -441,4 +445,55 @@ h1, h2, h3, h4, h5, h6 {
 .copy-toast-container .toast-header {
     background-color: transparent;
     border: none;
+}
+
+.info-toast-container .toast {
+    border-radius: 20px;
+    width: 400px;
+    max-width: 400px;
+}
+
+@media screen and (max-width:767px) {
+    .toast-container .toast, .info-toast-container .toast {
+        width: 350px;
+        max-width: 350px;
+    }
+}
+
+.info-toast-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 60px;
+    margin-right: 10px;
+}
+
+.info-status {
+    background-color: #F037A5;
+}
+
+.info-status i {
+    color: #FFFFFF;
+    padding-top: 12px;
+    padding-left: 13px;
+}
+
+.info-body {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.info-toast-container button {
+    color: #F037A5;
+    margin-top: 10px;
+    margin-right: 20px;
+}
+
+.info-toast-container button:focus {
+    outline: none;
+}
+
+.info-toast-container h6 {
+    margin-top: 15px;
 }

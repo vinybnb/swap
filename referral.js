@@ -33,10 +33,19 @@ async function init(){
         delay: 5000,
     };
     $('.copy-toast-container .toast').toast(options);
+
+    const infoOptions = {
+        delay: 20000,
+    }
+    $('.info-toast-container .toast').toast(infoOptions);
 }
 
 $('.copy-toast-container .toast').on('hidden.bs.toast', function () {
     $('.copy-toast-container').css("z-index", "-1");
+});
+
+$('.info-toast-container .toast').on('hidden.bs.toast', function () {
+    $('.info-toast-container').css("z-index", "-1");
 });
 
 async function loadCashPrice() {
@@ -62,14 +71,15 @@ async function renderInterface() {
         await enabledMoralisWeb3();
         networkId = await Moralis.web3.eth.net.getId();
         if (networkId != MAINNET_ID) {
-            alert('Please switch to Binance Smart Chain Wallet');
+            $('.info-toast-container .info-body').html('Please switch to Binance Smart Chain Wallet');
+            $('.info-toast-container').css("z-index", "1");
+            $('.info-toast-container .toast').toast('show');
             logOut();
         } else {
             const results = await Moralis.Cloud.run("getRef", { address: user.get("ethAddress") });
-            console.log(results);
             if (results.status == 'success') {
                 ref = results.ref;
-                $('#ref').val('https://swap.cash.io?ref=' + ref);
+                $('#ref').val('https://swap.caash.io?ref=' + ref);
             } else {
                 ref = '';
             }

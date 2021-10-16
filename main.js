@@ -45,11 +45,20 @@ async function init(){
     const options = {
         delay: 30000,
     };
-    $('.toast').toast(options);
+    $('.toast-container .toast').toast(options);
+
+    const infoOptions = {
+        delay: 20000,
+    }
+    $('.info-toast-container .toast').toast(infoOptions);
 }
 
-$('.toast').on('hidden.bs.toast', function () {
+$('.toast-container .toast').on('hidden.bs.toast', function () {
     $('.toast-container').css("z-index", "-1");
+});
+
+$('.info-toast-container .toast').on('hidden.bs.toast', function () {
+    $('.info-toast-container').css("z-index", "-1");
 });
 
 async function listAvailableTokens(){
@@ -121,7 +130,9 @@ async function renderInterface() {
         await enabledMoralisWeb3();
         networkId = await Moralis.web3.eth.net.getId();
         if (networkId != MAINNET_ID) {
-            alert('Please switch to Binance Smart Chain Wallet');
+            $('.info-toast-container .info-body').html('Please switch to Binance Smart Chain Wallet');
+            $('.info-toast-container').css("z-index", "1");
+            $('.info-toast-container .toast').toast('show');
             logOut();
         } else {
             await getBalances();
@@ -316,23 +327,24 @@ async function getQuote() {
 }
 
 async function trySwap(){
-    let address = Moralis.User.current().get("ethAddress");
-    if(currentTrade.from.symbol !== "ETH"){
-        const allowance = await dex.hasAllowance({
-            chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
-            fromTokenAddress: currentTrade.from.address, // The token you want to swap
-            fromAddress: address, // Your wallet address
-            amount: Moralis.Units.Token(fromAmount, currentTrade.from.decimals).toString(),
-        })
-        if(!allowance){
-            await dex.approve({
-                chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
-                tokenAddress: currentTrade.from.address, // The token you want to swap
-                fromAddress: address, // Your wallet address
-              });
-        }
-    }
     try {
+        let address = Moralis.User.current().get("ethAddress");
+        if(currentTrade.from.symbol !== "ETH"){
+            const allowance = await dex.hasAllowance({
+                chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
+                fromTokenAddress: currentTrade.from.address, // The token you want to swap
+                fromAddress: address, // Your wallet address
+                amount: Moralis.Units.Token(fromAmount, currentTrade.from.decimals).toString(),
+            })
+            if(!allowance){
+                await dex.approve({
+                    chain: 'bsc', // The blockchain you want to use (eth/bsc/polygon)
+                    tokenAddress: currentTrade.from.address, // The token you want to swap
+                    fromAddress: address, // Your wallet address
+                });
+            }
+        }
+        
         $('#swap_button').text('Swapping...');
         $('#swap_button').prop('disabled', true);
         let receipt = await dex.swap({
@@ -344,16 +356,28 @@ async function trySwap(){
             slippage: Number($('#slippage').text()),
         });
         // const receipt = await $.get(API_1INCH_BASE + `swap?fromAddress=${user.get('ethAddress')}&fromTokenAddress=${currentTrade.from.address}&toTokenAddress=${currentTrade.to.address}&amount=${Moralis.Units.Token(1, currentTrade.from.decimals).toString()}&slippage=${Number($('#slippage').text())}&protocols=PANCAKESWAP_V2`);
-        // console.log(receipt);
-        $('.receipt-body').text(`Swap ${fromAmount} ${currentTrade.from.symbol} for ${toAmount} ${currentTrade.to.symbol}`);
-        $('.receipt-link a').prop('href', 'https://bscscan.com/tx/' + receipt.transactionHash);
+        if (receipt.transactionHash) {
+            $('.receipt-body').text(`Swap ${fromAmount} ${currentTrade.from.symbol} for ${toAmount} ${currentTrade.to.symbol}`);
+            $('.receipt-link a').prop('href', 'https://bscscan.com/tx/' + receipt.transactionHash);
+            $('#swap_button').text('Begin Swap');
+            $('#swap_button').prop('disabled', false);
+            await updateTokenBalance();
+            $('.toast-container').css("z-index", "1");
+            $('.toast').toast('show');
+        } else {
+            throw new Error(receipt.message);
+        }
+    } catch (error) {
+        let errorMessage = error.message;
+        if (errorMessage.includes('Not enough')) {
+            errorMessage = 'Not enough ' + currentTrade.from.symbol;
+        }
+        
+        $('.info-toast-container .info-body').html(errorMessage);
+        $('.info-toast-container').css("z-index", "1");
+        $('.info-toast-container .toast').toast('show');
         $('#swap_button').text('Begin Swap');
         $('#swap_button').prop('disabled', false);
-        await updateTokenBalance();
-        $('.toast-container').css("z-index", "1");
-        $('.toast').toast('show');
-    } catch (error) {
-        console.log(error);
     }
 }
 
