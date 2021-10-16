@@ -109,12 +109,32 @@
                         <div class="text-dark mt-2 mb-2 text-bold">Share referral link</div>
                         <div class="referral_link">
                             <input id="ref" type="text" class="form-control" readonly value="">
-                            <i class="fa fa-copy fa-2x btn-copy text-blue ml-3 mt-1"></i>
+                            <i class="fa fa-copy fa-2x btn-copy text-blue ml-3 mt-1" onclick="copy()"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    <!-- Flexbox container for aligning the toasts -->
+    <div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center"
+        style="min-height: 400px;">
+        <!-- Then put toasts within -->
+        <div class="copy-toast-container">
+            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <i class="fa fa-check-circle"></i>
+                    <strong class="mr-auto">Copied!</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="copy-toast" role="alert" aria-live="assertive" aria-atomic="true" z-index="-1">
+        <div class="toast-header">
+            <i class="fa fa-check-circle"></i>
+            <strong class="mr-auto">Copied!</strong>
+        </div>
+    </div> -->
     </div>
     <div class="modal fade" id="wallets_modal" tabindex="-1" role="dialog" aria-labelledby="wallets_modal_label"
         aria-hidden="true">

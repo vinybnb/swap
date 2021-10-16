@@ -30,10 +30,14 @@ async function init(){
     dex = Moralis.Plugins.oneInch;
     await renderInterface();
     const options = {
-        delay: 30000,
+        delay: 5000,
     };
-    $('.toast').toast(options);
+    $('.copy-toast-container .toast').toast(options);
 }
+
+$('.copy-toast-container .toast').on('hidden.bs.toast', function () {
+    $('.copy-toast-container').css("z-index", "-1");
+});
 
 async function loadCashPrice() {
     const options = {
@@ -124,6 +128,21 @@ async function logOut() {
     await Moralis.User.logOut();
     window.localStorage.removeItem('provider');
     await renderInterface();
+}
+
+function copy() {
+    /* Get the text field */
+    var copyText = document.getElementById("ref");
+  
+    /* Select the text field */
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); /* For mobile devices */
+  
+    /* Copy the text inside the text field */
+    navigator.clipboard.writeText(copyText.value);
+
+    $('.copy-toast-container').css("z-index", "1");
+    $('.copy-toast-container .toast').toast('show');
 }
 
 init();
