@@ -385,10 +385,12 @@ h1, h2, h3, h4, h5, h6 {
 .refer_description {
     text-align: center;
     margin-bottom: 20px;
+    font-size: 20px;
 }
 
 .refer .nav-pills .nav-link.active, .refer .nav-pills .show > .nav-link {
     background-color: #2D46B9;
+    border-radius: 500px;
 }
 
 .refer .nav-item a {
