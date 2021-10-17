@@ -36,7 +36,7 @@ h1, h2, h3, h4, h5, h6 {
     font-family: 'PlusJakartaSansBold', Helvetica, Arial, sans-serif;
 }
 
-#window{
+#window, #refer_window {
     margin-top: 60px;
     margin-bottom: auto;
     margin-left: auto;
@@ -49,8 +49,12 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 0 5px rgb(230, 230, 230);
 }
 
+#refer_window {
+    max-width: 380px;
+}
+
 @media screen and (max-width:767px) {
-    #window {
+    #window, #refer_window {
         margin-top: 40px;
     }
 }
@@ -87,7 +91,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media screen and (max-width: 767px) {
-    #window {
+    #window, #refer_window {
         margin-left: 10px;
         margin-right: 10px;
         margin-top: 30px
@@ -366,6 +370,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .logo img {
     margin-top: -10px;
+}
+
+.refer {
+    width: 380px;
+    max-width: 380px;
 }
 
 .refer_balance {
