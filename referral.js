@@ -3,6 +3,10 @@ let user;
 let balances = {};
 let web3;
 let ref = '';
+let reward = 0;
+let rewardTransactions = [];
+
+const BSCSCAN_TX_URL = 'https://bscscan.com/tx/';
 const DECIMALS = 5;
 const NATIVE_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 const WBNB_ADDRESS = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
@@ -76,8 +80,9 @@ async function renderInterface() {
             $('.info-toast-container .toast').toast('show');
             logOut();
         } else {
-            const reward = await getReward();
+            await getReward();
             $('#reward').text(formatNumber(Number(reward.toFixed(DECIMALS))));
+            displayTransactions();
             const results = await Moralis.Cloud.run("getRef", { address: user.get("ethAddress") });
             if (results.status == 'success') {
                 ref = results.ref;
@@ -127,10 +132,33 @@ async function connectWallet(provider) {
 async function getReward() {
     const results = await Moralis.Cloud.run("getReward", { address: user.get("ethAddress") });
     if (results.status == 'success') {
-        return results.reward;
+        reward = results.reward;
+        rewardTransactions = results.rewardTransactions;
+    } else {
+        reward = 0;
+        rewardTransactions = [];
     }
+}
 
-    return 0;
+function displayTransactions() {
+    if (rewardTransactions.length === 0) {
+        $('#rewards').html('No transactions found!');
+    } else {
+        $('#rewards').html('');
+        let transactionsHtml = '<table class="table rewards_table">';
+        let i = 1;
+        for (const rewardTransaction of rewardTransactions) {
+            let transactionItem = '<tr>';
+            transactionItem += `<td>#${i}</td>`;
+            transactionItem += `<td class="transaction_link"><a href="${BSCSCAN_TX_URL + rewardTransaction.transactionHash}" target="_blank">${shortenAddress(rewardTransaction.transactionHash)}</a></td>`;
+            transactionItem += `<td class="d-flex justify-content-end transaction_reward">${rewardTransaction.reward} CASH</td>`;
+            transactionItem += '</tr>';
+            transactionsHtml += transactionItem;
+            i++;
+        }
+        transactionsHtml += '</table>';
+        $('#rewards').html(transactionsHtml);
+    }
 }
 
 async function enabledMoralisWeb3() {

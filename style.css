@@ -512,3 +512,7 @@ h1, h2, h3, h4, h5, h6 {
 #rewards {
     padding-top: 20px;
 }
+
+.rewards_table .transaction_link a:hover {
+    text-decoration: none;
+}
