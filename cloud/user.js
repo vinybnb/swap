@@ -137,8 +137,7 @@ Moralis.Cloud.define("rewardReference", async (request) => {
 
                         if (response.data.toTokenAmount) {
                             // reward 0.1% BNB value
-                            const cashRewardAmount = response.data.toTokenAmount / (10 ** 21);
-                            const reward = Number(cashRewardAmount.toFixed(DECIMALS));
+                            const reward = response.data.toTokenAmount / (10 ** 21);
                             const updatedReward = (referenceUser.attributes.reward || 0) + reward;
                             const updatedTotalReward = (referenceUser.attributes.totalReward || 0) + reward;
                             referenceUser.set('reward', updatedReward);
