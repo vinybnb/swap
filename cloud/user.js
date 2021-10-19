@@ -81,14 +81,32 @@ Moralis.Cloud.define("setReference", async (request) => {
 
 Moralis.Cloud.define("getReward", async (request) => {
     const User = Moralis.Object.extend("User");
-    const query = new Moralis.Query(User);
+    let query = new Moralis.Query(User);
     query.equalTo("ethAddress", request.params.address);
     const user = await query.first({ useMasterKey: true });
     if (user && user.attributes.reward) {
-        return { "status": "success", "reward": user.attributes.reward };
+        const RewardTransaction = Moralis.Object.extend("RewardTransaction");
+        query = new Moralis.Query(RewardTransaction);
+        query.equalTo('ref', user.attributes.ref);
+        // const pipeline = [
+        //     { sort: { createdAt: -1 } },
+        //     { limit: 1 }
+        // ];
+        // const rewardTransactions = await query.aggregate(pipeline);
+        const rewardTransactions = await query.find();
+
+        let rewardTransactionsArr = [];
+        for (let i = 0; i < rewardTransactions.length; i++) {
+            rewardTransactionsArr.push({
+                transactionHash: rewardTransactions[i].attributes.transactionHash,
+                reward: rewardTransactions[i].attributes.reward,
+            });
+        }
+
+        return { "status": "success", "reward": user.attributes.reward, "rewardTransactions": rewardTransactionsArr };
     }
 
-    return { "status": "success", "reward": 0 };
+    return { "status": "success", "reward": 0, "rewardTransactions": [] };
 });
 
 Moralis.Cloud.define("rewardReference", async (request) => {
