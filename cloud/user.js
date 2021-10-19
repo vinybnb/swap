@@ -93,18 +93,32 @@ Moralis.Cloud.define("getReward", async (request) => {
 
 Moralis.Cloud.define("rewardReference", async (request) => {
     const User = Moralis.Object.extend("User");
+    const RewardTransaction = Moralis.Object.extend("RewardTransaction");
     const query = new Moralis.Query(User);
-    query.equalTo("ethAddress", request.params.address);
+    const transactionHash = request.params.transactionHash;
+    const address = request.params.address;
+    query.equalTo("ethAddress", address);
     const user = await query.first({ useMasterKey: true });
     if (user && user.attributes.reference) {
         const referenceQuery = new Moralis.Query(User);
         referenceQuery.equalTo("ref", user.attributes.reference);
         const referenceUser = await referenceQuery.first({ useMasterKey: true });
         if (referenceUser) {
+            // first, check the hash exists or not. If yes, return error
+            const rewardTransactionQuery = new Moralis.Query(RewardTransaction);
+            const transactionHashes = [];
+            const rewardTransactions = await rewardTransactionQuery.find();
+            for (let i = 0; i < rewardTransactions.length; i++) {
+                transactionHashes.push(rewardTransactions[i].attributes.transactionHash);
+            }
+            if (transactionHashes.includes(transactionHash)) {
+                return { "status": "error", "message": "Transaction exists!" };
+            }
+
             const web3 = Moralis.web3ByChain("0x38");
-            const transaction = await web3.eth.getTransaction(request.params.transactionHash);
+            const transaction = await web3.eth.getTransaction(transactionHash);
             // make sure the from address of the transaction is the same as the user address.
-            if (transaction && transaction.from.toLowerCase() === request.params.address.toLowerCase()) {
+            if (transaction && transaction.from.toLowerCase() === address.toLowerCase()) {
                 const block = await web3.eth.getBlock(transaction.blockHash);
                 const timeDiff = Math.floor(Date.now() / 1000) - block.timestamp;
                 // We will only allow transactions no more than 2 minutes ago
@@ -121,7 +135,7 @@ Moralis.Cloud.define("rewardReference", async (request) => {
                             }
                         });
 
-                        if (response.status == 'success') {
+                        if (response.data.toTokenAmount) {
                             // reward 0.1% BNB value
                             const cashRewardAmount = response.data.toTokenAmount / (10 ** 21);
                             const reward = Number(cashRewardAmount.toFixed(DECIMALS));
@@ -131,6 +145,13 @@ Moralis.Cloud.define("rewardReference", async (request) => {
                             referenceUser.set('totalReward', updatedTotalReward);
                             referenceUser.save(null, { useMasterKey: true });
 
+                            // store this tx hash to the RewardTransaction table
+                            const rewardTransaction = new RewardTransaction();
+                            rewardTransaction.set('ref', user.attributes.reference);
+                            rewardTransaction.set('transactionHash', transactionHash);
+                            rewardTransaction.set('reward', reward);
+                            await rewardTransaction.save();
+
                             return { "status": "success", "reward": reward,  "updatedReward": updatedReward, "updatedTotalReward": updatedTotalReward };
                         }
                     }
@@ -138,17 +159,10 @@ Moralis.Cloud.define("rewardReference", async (request) => {
             }
         }
 
-        return { "status": "error", "message": "Update reward failed!" };
+        return { "status": "error", "message": "Reward reference failed!" };
     }
 
-
-    const res = await Moralis.web3.eth.getTransaction("0xdb065a91998b6ff9fc407c9946837a5194969cf1b6e07aff1ae3cb448630212b");
-    console.log('res', res);
-    const res2 = await Moralis.web3.eth.getBlock("0xd828c8aa3eda80848708ad7cfb5c12207af8296ca1dbbcfec3c1a26551e9693a");
-    console.log('res2', res2);
-    console.log((Math.floor(Date.now() / 1000) - res2.timestamp) > 300);
-
-    return { "status": "success", "reward": 0 };
+    return { "status": "error", "message": "User not found" };
 });
 
 function makeid(length) {
