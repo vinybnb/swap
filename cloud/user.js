@@ -87,23 +87,14 @@ Moralis.Cloud.define("getReward", async (request) => {
     if (user && user.attributes.reward) {
         const RewardTransaction = Moralis.Object.extend("RewardTransaction");
         query = new Moralis.Query(RewardTransaction);
-        query.equalTo('ref', user.attributes.ref);
-        // const pipeline = [
-        //     { sort: { createdAt: -1 } },
-        //     { limit: 1 }
-        // ];
-        // const rewardTransactions = await query.aggregate(pipeline);
-        const rewardTransactions = await query.find();
+        const pipeline = [
+            { match: { ref: user.attributes.ref } },
+            { sort: { createdAt: -1 } },
+            { limit: 5 }
+        ];
+        const rewardTransactions = await query.aggregate(pipeline);
 
-        let rewardTransactionsArr = [];
-        for (let i = 0; i < rewardTransactions.length; i++) {
-            rewardTransactionsArr.push({
-                transactionHash: rewardTransactions[i].attributes.transactionHash,
-                reward: rewardTransactions[i].attributes.reward,
-            });
-        }
-
-        return { "status": "success", "reward": user.attributes.reward, "rewardTransactions": rewardTransactionsArr };
+        return { "status": "success", "reward": user.attributes.reward, "rewardTransactions": rewardTransactions };
     }
 
     return { "status": "success", "reward": 0, "rewardTransactions": [] };
