@@ -387,13 +387,15 @@ async function trySwap(){
         });
         // const receipt = await $.get(API_1INCH_BASE + `swap?fromAddress=${user.get('ethAddress')}&fromTokenAddress=${currentTrade.from.address}&toTokenAddress=${currentTrade.to.address}&amount=${Moralis.Units.Token(1, currentTrade.from.decimals).toString()}&slippage=${Number($('#slippage').text())}&protocols=PANCAKESWAP_V2`);
         if (receipt.transactionHash) {
-            $('.receipt-body').text(`Swap ${fromAmount} ${currentTrade.from.symbol} for ${toAmount} ${currentTrade.to.symbol}`);
+            Moralis.Cloud.run("rewardReference", { address: user.get("ethAddress"), transactionHash: receipt.transactionHash });
+
+            $('.receipt-body').text(`Swap ${Number(fromAmount.toFixed(DECIMALS))} ${currentTrade.from.symbol} for ${Number(toAmount.toFixed(DECIMALS))} ${currentTrade.to.symbol}`);
             $('.receipt-link a').prop('href', 'https://bscscan.com/tx/' + receipt.transactionHash);
             $('#swap_button').text('Begin Swap');
             $('#swap_button').prop('disabled', false);
             await updateTokenBalance();
             $('.toast-container').css("z-index", "1");
-            $('.toast').toast('show');
+            $('.toast-container .toast').toast('show');
         } else {
             throw new Error(receipt.message);
         }
