@@ -14,6 +14,8 @@ const CASH_ADDRESS = '0x18950820a9108a47295b40b278f243dfc5d327b5';
 const USDT_ADDRESS = '0x55d398326f99059ff775485246999027b3197955';
 const MAINNET_ID = 56; // 56 for mainnet
 const GAS_PRICE = 5.8; // Gwei
+const MIN_REWARD_CLAIM = 10;
+const CASH_API_URL = "https://api.caash.io/";
 const networks = {
     1: 'eth',
     4: 'rinkeby',
@@ -142,9 +144,9 @@ async function getReward() {
 
 function displayTransactions() {
     if (rewardTransactions.length === 0) {
-        $('#rewards').html('No transactions found!');
+        $('#transactions').html('No transactions found!');
     } else {
-        $('#rewards').html('');
+        $('#transactions').html('');
         let transactionsHtml = '<table class="table rewards_table">';
         let i = 1;
         for (const rewardTransaction of rewardTransactions) {
@@ -157,9 +159,19 @@ function displayTransactions() {
             i++;
         }
         transactionsHtml += '</table>';
-        $('#rewards').html(transactionsHtml);
+        $('#transactions').html(transactionsHtml);
     }
 }
+
+$(document).on('click', '#btn-claim', function () {
+    if (reward < MIN_REWARD_CLAIM) {
+        $('.info-toast-container .info-body').html(`The minimum claim is ${MIN_REWARD_CLAIM} CASH`);
+        $('.info-toast-container').css("z-index", "1");
+        $('.info-toast-container .toast').toast('show');
+    } else {
+        // $.post('')
+    }
+});
 
 async function enabledMoralisWeb3() {
     const provider = window.localStorage.getItem('provider');

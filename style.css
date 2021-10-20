@@ -536,3 +536,14 @@ a {
     color: #FFF;
     background-color: #2D46B9;
 }
+
+#btn-claim {
+    color: #F037A5;
+    border-color: #F037A5;
+}
+
+#btn-claim:hover {
+    color: #FFF;
+    background-color: #F037A5;
+    border-color: #F037A5;
+}
