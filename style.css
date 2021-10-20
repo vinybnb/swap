@@ -516,3 +516,22 @@ h1, h2, h3, h4, h5, h6 {
 .rewards_table .transaction_link a:hover {
     text-decoration: none;
 }
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff;
+    background-color: #2D46B9;
+}
+
+a {
+    color: #2D46B9;
+}
+
+.btn-outline-primary {
+    color: #2D46B9;
+    border-color: #2D46B9;
+}
+
+.btn-outline-primary:hover {
+    color: #FFF;
+    background-color: #2D46B9;
+}
