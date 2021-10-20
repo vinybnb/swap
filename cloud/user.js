@@ -84,7 +84,7 @@ Moralis.Cloud.define("getReward", async (request) => {
   let query = new Moralis.Query(User);
   query.equalTo("ethAddress", request.params.address);
   const user = await query.first({ useMasterKey: true });
-  if (user && user.attributes.reward) {
+  if (user) {
     const RewardTransaction = Moralis.Object.extend("RewardTransaction");
     query = new Moralis.Query(RewardTransaction);
     const pipeline = [
