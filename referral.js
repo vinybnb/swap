@@ -15,209 +15,230 @@ const USDT_ADDRESS = '0x55d398326f99059ff775485246999027b3197955';
 const MAINNET_ID = 56; // 56 for mainnet
 const GAS_PRICE = 5.8; // Gwei
 const MIN_REWARD_CLAIM = 10;
-const CASH_API_URL = "https://api.caash.io/";
+const CAASH_API_URL = "https://api.caash.io/";
+// const CAASH_API_URL = "http://localhost:3000/";
 const networks = {
-    1: 'eth',
-    4: 'rinkeby',
-    56: 'bsc',
-    97: 'bsc testnet',
-    137: 'matic',
-    80001: 'mumbai'
+  1: 'eth',
+  4: 'rinkeby',
+  56: 'bsc',
+  97: 'bsc testnet',
+  137: 'matic',
+  80001: 'mumbai'
 };
 
 // currently, Moralis plugin doesn't support protocols parameter so we will call 1inch API directly with protocol PANCAKESWAP_V2. Because without protocols parameter, the 1inch API return wrong price when the amount is <= 1 usdt due to the fee is often > 1usdt. And the important thing is the price from 1Inch without protocols parameter is average price from many dexes so and we want it to be the same with pancakeswap.
 
-setInterval(function(){ 
-    loadCashPrice();
+setInterval(function () {
+  loadCashPrice();
 }, 5000);
 
-async function init(){
-    await Moralis.initPlugins();
-    dex = Moralis.Plugins.oneInch;
-    await renderInterface();
-    const options = {
-        delay: 5000,
-    };
-    $('.copy-toast-container .toast').toast(options);
+async function init() {
+  await Moralis.initPlugins();
+  dex = Moralis.Plugins.oneInch;
+  await renderInterface();
+  const options = {
+    delay: 5000,
+  };
+  $('.copy-toast-container .toast').toast(options);
 
-    const infoOptions = {
-        delay: 20000,
-    }
-    $('.info-toast-container .toast').toast(infoOptions);
+  const infoOptions = {
+    delay: 20000,
+  }
+  $('.info-toast-container .toast').toast(infoOptions);
 }
 
 $('.copy-toast-container .toast').on('hidden.bs.toast', function () {
-    $('.copy-toast-container').css("z-index", "-1");
+  $('.copy-toast-container').css("z-index", "-1");
 });
 
 $('.info-toast-container .toast').on('hidden.bs.toast', function () {
-    $('.info-toast-container').css("z-index", "-1");
+  $('.info-toast-container').css("z-index", "-1");
 });
 
 async function loadCashPrice() {
-    const options = {
-        address: CASH_ADDRESS,
-        chain: "bsc",
-        exchange: "PancakeSwapv2"
-    };
-    const cashPrice = await Moralis.Web3API.token.getTokenPrice(options);
-    $('#cash_price').text(Number(cashPrice.usdPrice.toFixed(DECIMALS)));
+  const options = {
+    address: CASH_ADDRESS,
+    chain: "bsc",
+    exchange: "PancakeSwapv2"
+  };
+  const cashPrice = await Moralis.Web3API.token.getTokenPrice(options);
+  $('#cash_price').text(Number(cashPrice.usdPrice.toFixed(DECIMALS)));
 }
 
 async function renderInterface() {
-    user = Moralis.User.current();
-    if (user) {
-        document.getElementById("connect_wallet_button").hidden = true;
-        document.getElementById("logout_button").hidden = false;
-        document.getElementById("refer_not_connected").hidden = true;
-        document.getElementById("refer_connected").hidden = false;
+  user = Moralis.User.current();
+  if (user) {
+    document.getElementById("connect_wallet_button").hidden = true;
+    document.getElementById("logout_button").hidden = false;
+    document.getElementById("refer_not_connected").hidden = true;
+    document.getElementById("refer_connected").hidden = false;
 
-        $('#address').text(shortenAddress(user.get("ethAddress")));
-        $('#address').show(user.get("ethAddress"));
-        await enabledMoralisWeb3();
-        networkId = await Moralis.web3.eth.net.getId();
-        if (networkId != MAINNET_ID) {
-            $('.info-toast-container .info-body').html('Please switch to Binance Smart Chain Wallet');
-            $('.info-toast-container').css("z-index", "1");
-            $('.info-toast-container .toast').toast('show');
-            logOut();
-        } else {
-            await getReward();
-            $('#reward').text(formatNumber(Number(reward.toFixed(DECIMALS))));
-            displayTransactions();
-            const results = await Moralis.Cloud.run("getRef", { address: user.get("ethAddress") });
-            if (results.status == 'success') {
-                ref = results.ref;
-                $('#ref').val('https://swap.caash.io?ref=' + ref);
-            } else {
-                ref = '';
-            }
-        }
+    $('#address').text(shortenAddress(user.get("ethAddress")));
+    $('#address').show(user.get("ethAddress"));
+    await enabledMoralisWeb3();
+    networkId = await Moralis.web3.eth.net.getId();
+    if (networkId != MAINNET_ID) {
+      $('.info-toast-container .info-title').html('Error');
+      $('.info-toast-container .info-body').html('Please switch to Binance Smart Chain Wallet');
+      $('.info-toast-container').css("z-index", "1");
+      $('.info-toast-container .toast').toast('show');
+      logOut();
     } else {
-        document.getElementById("connect_wallet_button").hidden = false;
-        document.getElementById("logout_button").hidden = true;
-        document.getElementById("refer_not_connected").hidden = false;
-        document.getElementById("refer_connected").hidden = true;
-        $('#address').text('');
-        $('#address').hide();
+      await getReward();
+      $('#reward').text(formatNumber(Number((reward / 10 ** 18).toFixed(DECIMALS))));
+      displayTransactions();
+      const results = await Moralis.Cloud.run("getRef", { address: user.get("ethAddress") });
+      if (results.status == 'success') {
+        ref = results.ref;
+        $('#ref').val('https://swap.caash.io?ref=' + ref);
+      } else {
+        ref = '';
+      }
     }
+  } else {
+    document.getElementById("connect_wallet_button").hidden = false;
+    document.getElementById("logout_button").hidden = true;
+    document.getElementById("refer_not_connected").hidden = false;
+    document.getElementById("refer_connected").hidden = true;
+    $('#address').text('');
+    $('#address').hide();
+  }
 }
 
 function shortenAddress(address) {
-    return address.substring(0, 6) + '...' + address.substring(address.length - 5, address.length);
+  return address.substring(0, 6) + '...' + address.substring(address.length - 5, address.length);
 }
 
 async function connectWallet(provider) {
-    let user = Moralis.User.current();
-    $('#wallets_modal').modal('hide');
-    if (!user) {
-        switch (provider) {
-            case 'metamask':
-                user = await Moralis.authenticate();
-                window.localStorage.setItem('provider', 'metamask');
-                break;
-            case 'trustwallet':
-                user = await Moralis.authenticate();
-                window.localStorage.setItem('provider', 'trustwallet');
-                break;
-            case 'walletconnect':
-                user = await Moralis.authenticate({ provider: provider });
-                window.localStorage.setItem('provider', 'walletconnect');
-                break;
-            default:
-                break;
-        }
+  let user = Moralis.User.current();
+  $('#wallets_modal').modal('hide');
+  if (!user) {
+    switch (provider) {
+      case 'metamask':
+        user = await Moralis.authenticate();
+        window.localStorage.setItem('provider', 'metamask');
+        break;
+      case 'trustwallet':
+        user = await Moralis.authenticate();
+        window.localStorage.setItem('provider', 'trustwallet');
+        break;
+      case 'walletconnect':
+        user = await Moralis.authenticate({ provider: provider });
+        window.localStorage.setItem('provider', 'walletconnect');
+        break;
+      default:
+        break;
     }
-    await renderInterface();
+  }
+  await renderInterface();
 }
 
 async function getReward() {
-    const results = await Moralis.Cloud.run("getReward", { address: user.get("ethAddress") });
-    if (results.status == 'success') {
-        reward = results.reward;
-        rewardTransactions = results.rewardTransactions;
-    } else {
-        reward = 0;
-        rewardTransactions = [];
-    }
+  const results = await Moralis.Cloud.run("getReward", { address: user.get("ethAddress") });
+  if (results.status == 'success') {
+    reward = results.reward;
+    rewardTransactions = results.rewardTransactions;
+  } else {
+    reward = 0;
+    rewardTransactions = [];
+  }
 }
 
 function displayTransactions() {
-    if (rewardTransactions.length === 0) {
-        $('#transactions').html('No transactions found!');
-    } else {
-        $('#transactions').html('');
-        let transactionsHtml = '<table class="table rewards_table">';
-        let i = 1;
-        for (const rewardTransaction of rewardTransactions) {
-            let transactionItem = '<tr>';
-            transactionItem += `<td>#${i}</td>`;
-            transactionItem += `<td class="transaction_link"><a href="${BSCSCAN_TX_URL + rewardTransaction.transactionHash}" target="_blank">${shortenAddress(rewardTransaction.transactionHash)}</a></td>`;
-            transactionItem += `<td class="d-flex justify-content-end transaction_reward">${rewardTransaction.reward} CASH</td>`;
-            transactionItem += '</tr>';
-            transactionsHtml += transactionItem;
-            i++;
-        }
-        transactionsHtml += '</table>';
-        $('#transactions').html(transactionsHtml);
+  if (rewardTransactions.length === 0) {
+    $('#transactions').html('<p class="text-center">No transactions found!</p>');
+  } else {
+    $('#transactions').html('');
+    let transactionsHtml = '<table class="table rewards_table">';
+    let i = 1;
+    for (const rewardTransaction of rewardTransactions) {
+      let transactionItem = '<tr>';
+      transactionItem += `<td>#${i}</td>`;
+      transactionItem += `<td class="transaction_link"><a href="${BSCSCAN_TX_URL + rewardTransaction.transactionHash}" target="_blank">${shortenAddress(rewardTransaction.transactionHash)}</a></td>`;
+      transactionItem += `<td class="d-flex justify-content-end transaction_reward">${rewardTransaction.reward} CASH</td>`;
+      transactionItem += '</tr>';
+      transactionsHtml += transactionItem;
+      i++;
     }
+    transactionsHtml += '</table>';
+    $('#transactions').html(transactionsHtml);
+  }
 }
 
-$(document).on('click', '#btn-claim', function () {
-    if (reward < MIN_REWARD_CLAIM) {
-        $('.info-toast-container .info-body').html(`The minimum claim is ${MIN_REWARD_CLAIM} CASH`);
-        $('.info-toast-container').css("z-index", "1");
-        $('.info-toast-container .toast').toast('show');
+$(document).on('click', '#btn-claim', async function () {
+  if (reward < MIN_REWARD_CLAIM) {
+    $('.info-toast-container .info-title').html('Error');
+    $('.info-toast-container .info-body').html(`The minimum claim is ${MIN_REWARD_CLAIM} CASH`);
+    $('.info-toast-container').css("z-index", "1");
+    $('.info-toast-container .toast').toast('show');
+  } else {
+    const response = await $.post(CAASH_API_URL + 'claim-reward', {
+      address: user.get("ethAddress")
+    });
+    if (response.status == 'success') {
+      $('.info-toast-container .info-title').html('Success');
+      $('.info-toast-container .info-body').html(`
+        <div class="receipt-body">You have claimed ${formatNumber(Number((reward / 10 ** 18).toFixed(DECIMALS)))} CASH successfully.</div>
+        <div class="receipt-link"><a href="${BSCSCAN_TX_URL + response.transactionHash}" target="_blank">View on BscScan</a></div>
+      `);
+      $('.info-toast-container').css("z-index", "1");
+      $('.info-toast-container .toast').toast('show');
+      reward = 0;
+      $('#reward').text('0.00');
     } else {
-        // $.post('')
+      $('.info-toast-container .info-title').html('Error');
+      $('.info-toast-container .info-body').html(response.message);
+      $('.info-toast-container').css("z-index", "1");
+      $('.info-toast-container .toast').toast('show');
     }
+  }
 });
 
 async function enabledMoralisWeb3() {
-    const provider = window.localStorage.getItem('provider');
-    switch (provider) {
-        case 'walletconnect':
-            web3 = await Moralis.enable({ provider: provider });
-            break;
-        default:
-            web3 = await Moralis.enable();
-            break;
-    }
+  const provider = window.localStorage.getItem('provider');
+  switch (provider) {
+    case 'walletconnect':
+      web3 = await Moralis.enable({ provider: provider });
+      break;
+    default:
+      web3 = await Moralis.enable();
+      break;
+  }
 }
 
 async function logOut() {
-    await Moralis.User.logOut();
-    window.localStorage.removeItem('provider');
-    await renderInterface();
+  await Moralis.User.logOut();
+  window.localStorage.removeItem('provider');
+  await renderInterface();
 }
 
 function copy() {
-    /* Get the text field */
-    var copyText = document.getElementById("ref");
-  
-    /* Select the text field */
-    copyText.select();
-    copyText.setSelectionRange(0, 99999); /* For mobile devices */
-  
-    /* Copy the text inside the text field */
-    navigator.clipboard.writeText(copyText.value);
+  /* Get the text field */
+  var copyText = document.getElementById("ref");
 
-    $('.copy-toast-container').css("z-index", "1");
-    $('.copy-toast-container .toast').toast('show');
+  /* Select the text field */
+  copyText.select();
+  copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+  /* Copy the text inside the text field */
+  navigator.clipboard.writeText(copyText.value);
+
+  $('.copy-toast-container').css("z-index", "1");
+  $('.copy-toast-container .toast').toast('show');
 }
 
 function formatNumber(number) {
-    if (!isNaN(number)) {
-        number = number.toString();
-    }
-    const dotPosition = number.indexOf('.');
-    if (dotPosition === -1) {
-        return number + '.00';
-    } else if (dotPosition === number.length - 2) {
-        return number + '0';
-    }
+  if (!isNaN(number)) {
+    number = number.toString();
+  }
+  const dotPosition = number.indexOf('.');
+  if (dotPosition === -1) {
+    return number + '.00';
+  } else if (dotPosition === number.length - 2) {
+    return number + '0';
+  }
 
-    return number;
+  return number;
 }
 
 init();
