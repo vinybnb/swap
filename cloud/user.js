@@ -94,7 +94,7 @@ Moralis.Cloud.define("getReward", async (request) => {
     ];
     const rewardTransactions = await query.aggregate(pipeline);
 
-    return { "status": "success", "reward": user.attributes.reward, "rewardTransactions": rewardTransactions };
+    return { "status": "success", "reward": user.attributes.reward || 0, "rewardTransactions": rewardTransactions };
   }
 
   return { "status": "success", "reward": 0, "rewardTransactions": [] };

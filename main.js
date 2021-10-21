@@ -137,7 +137,7 @@ async function renderInterface() {
         $('#address').text(shortenAddress(user.get("ethAddress")));
         $('#address').show(user.get("ethAddress"));
         await enabledMoralisWeb3();
-        networkId = await Moralis.web3.eth.net.getId();
+        const networkId = await web3.eth.net.getId();
         if (networkId != MAINNET_ID) {
             $('.info-toast-container .info-body').html('Please switch to Binance Smart Chain Wallet');
             $('.info-toast-container').css("z-index", "1");
