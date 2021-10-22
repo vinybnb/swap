@@ -12,12 +12,12 @@
 
 html, body {
     font-family: 'PlusJakartaSansRegular', Helvetica, Arial, sans-serif;
-    overflow-y: hidden;
+    /* overflow-y: hidden; */
     background-image: url(../images/bg.png);
     background-position: top center;
     background-repeat: no-repeat;
-    touch-action: none;
-    -ms-touch-action: none;
+    /* touch-action: none; */
+    /* -ms-touch-action: none; */
 }
 
 .container {
