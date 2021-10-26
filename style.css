@@ -11,6 +11,7 @@
 }
 
 html, body {
+    background-color: #F5F5F5;
     font-family: 'PlusJakartaSansRegular', Helvetica, Arial, sans-serif;
     /* overflow-y: hidden; */
     background-image: url(../images/bg.png);
@@ -38,7 +39,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #window, #refer_window {
-    margin-top: 60px;
+    margin-top: 40px;
     margin-bottom: auto;
     margin-left: auto;
     margin-right: auto;
