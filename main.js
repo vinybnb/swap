@@ -424,7 +424,7 @@ function formatNumber(number) {
     number = number + "0";
   }
 
-  return number.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // thousands separator
+  return number;
 }
 
 function exchangeToken() {
