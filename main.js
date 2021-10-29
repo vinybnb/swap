@@ -417,11 +417,11 @@ function formatNumber(number) {
   if (!isNaN(number)) {
     number = number.toString();
   }
-  const dotPosition = number.indexOf('.');
+  const dotPosition = number.indexOf(".");
   if (dotPosition === -1) {
-    return number + '.00';
+    number = number + ".00";
   } else if (dotPosition === number.length - 2) {
-    return number + '0';
+    number = number + "0";
   }
 
   return number;
