@@ -240,7 +240,6 @@ function shortenAddress(address) {
 }
 
 async function connectWallet(provider) {
-  let user = Moralis.User.current();
   $('#wallets_modal').modal('hide');
   if (!user) {
     switch (provider) {
