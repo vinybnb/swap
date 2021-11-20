@@ -108,14 +108,14 @@ async function loadCashPrice() {
 }
 
 async function loadCowPrice() {
-    const options = {
-      address: COW_ADDRESS,
-      chain: "bsc",
-      exchange: "PancakeSwapv2"
-    };
-    const cowPrice = await Moralis.Web3API.token.getTokenPrice(options);
-    $('#cow_price').text(Number(cowPrice.usdPrice.toFixed(DECIMALS)));
-  }
+  const options = {
+    address: COW_ADDRESS,
+    chain: "bsc",
+    exchange: "PancakeSwapv2"
+  };
+  const cowPrice = await Moralis.Web3API.token.getTokenPrice(options);
+  $('#cow_price').text(Number(cowPrice.usdPrice.toFixed(DECIMALS)));
+}
 
 function showTokensList(filteredTokens) {
   let parent = document.getElementById("token_list");
