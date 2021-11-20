@@ -16,6 +16,7 @@ const API_1INCH_BASE = "https://api.1inch.exchange/v3.0/56/";
 const NATIVE_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 const WBNB_ADDRESS = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
 const CASH_ADDRESS = '0x18950820a9108a47295b40b278f243dfc5d327b5';
+const COW_ADDRESS = '0xcDD1d715F01bF959Bf94Cd553F43250ddb303D1f';
 const USDT_ADDRESS = '0x55d398326f99059ff775485246999027b3197955';
 const MAINNET_ID = 56; // 56 for mainnet
 const GAS_PRICE = 5.8; // Gwei
@@ -32,6 +33,10 @@ const networks = {
 
 setInterval(function () {
   loadCashPrice();
+}, 5000);
+
+setInterval(function () {
+  loadCowPrice();
 }, 5000);
 
 async function init() {
@@ -80,7 +85,14 @@ async function listAvailableTokens() {
     name: 'Caash',
     decimals: 18,
     address: CASH_ADDRESS,
-    logoURI: 'https://bscscan.com/token/images/caashme_32.png'
+    logoURI: '/images/caash.webp'
+  }
+  tokens[COW_ADDRESS] = {
+    symbol: 'COW',
+    name: 'CaashCOW',
+    decimals: 18,
+    address: COW_ADDRESS,
+    logoURI: '/images/cow.png'
   }
   showTokensList(tokens);
 }
@@ -94,6 +106,16 @@ async function loadCashPrice() {
   const cashPrice = await Moralis.Web3API.token.getTokenPrice(options);
   $('#cash_price').text(Number(cashPrice.usdPrice.toFixed(DECIMALS)));
 }
+
+async function loadCowPrice() {
+    const options = {
+      address: COW_ADDRESS,
+      chain: "bsc",
+      exchange: "PancakeSwapv2"
+    };
+    const cowPrice = await Moralis.Web3API.token.getTokenPrice(options);
+    $('#cow_price').text(Number(cowPrice.usdPrice.toFixed(DECIMALS)));
+  }
 
 function showTokensList(filteredTokens) {
   let parent = document.getElementById("token_list");
@@ -111,6 +133,10 @@ function showTokensList(filteredTokens) {
     parent.appendChild(div);
   }
   if (filteredTokens[CASH_ADDRESS] !== undefined && filteredTokens[WBNB_ADDRESS] !== undefined) {
+    const cowHtml = $(`.token_row[data-address=${COW_ADDRESS}]`).prop('outerHTML');
+    $(`.token_row[data-address=${COW_ADDRESS}]`).remove();
+    $(`.token_row[data-address=${WBNB_ADDRESS}]`).after(cowHtml);
+
     const cashHtml = $(`.token_row[data-address=${CASH_ADDRESS}]`).prop('outerHTML');
     $(`.token_row[data-address=${CASH_ADDRESS}]`).remove();
     $(`.token_row[data-address=${WBNB_ADDRESS}]`).after(cashHtml);
