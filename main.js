@@ -33,11 +33,11 @@ const networks = {
 
 setInterval(function () {
   loadCashPrice();
-}, 30000);
+}, 5000);
 
 setInterval(function () {
   loadCowPrice();
-}, 30000);
+}, 5000);
 
 async function init() {
   storeReference();
