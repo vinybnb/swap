@@ -33,11 +33,11 @@ const networks = {
 
 setInterval(function () {
   loadCashPrice();
-}, 5000);
+}, 10000);
 
 setInterval(function () {
   loadCowPrice();
-}, 5000);
+}, 10000);
 
 async function init() {
   storeReference();
@@ -57,6 +57,9 @@ async function init() {
     delay: 20000,
   }
   $('.info-toast-container .toast').toast(infoOptions);
+  
+  await loadCashPrice();
+  await loadCowPrice();
 }
 
 $('.toast-container .toast').on('hidden.bs.toast', function () {
